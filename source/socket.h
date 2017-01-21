@@ -13,19 +13,14 @@ namespace visNET{
 			setSocket(s);
 		}
 
-		void setSocket(SOCKET s){
-			m_handle = s;
-		}
+		void setSocket(SOCKET s) { m_handle = s; }
+		SOCKET getSocket() { return m_handle; }
 
-		SOCKET getSocket() {
-			return m_handle;
-		}
+		bool getAlive() { return m_bAlive; }
 
-		void write(const char* buffer, int32_t size);
-		int32_t read(char* buffer, int32_t size);
-
-		bool getAlive() {
-			return m_bAlive;
-		}
+		void write(const uint8_t* buffer, int32_t size);
+		void write(RawPacket* packet);
+		int32_t read(uint8_t* buffer, int32_t size);
+		bool read(RawPacket& packet);
 	};
 }

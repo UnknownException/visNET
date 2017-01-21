@@ -90,6 +90,10 @@ namespace visNET{
 		std::string readString();
 		void readBlobArray(BlobArray& blob);
 
-		virtual void finalize() {};
+		const uint8_t* getRawData() { return m_pData; }
+		const uint32_t getRawSize() { return m_nSize; }
+
+		virtual void onReceive(uint8_t* pData, uint32_t nLength); //Gets called after receiving
+		virtual void onSend() {}; //Gets called before being send
 	};
 }

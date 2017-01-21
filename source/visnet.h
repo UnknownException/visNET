@@ -9,6 +9,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include "blobarray.h"
+#include "rawpacket.h"
 
 namespace visNET{
 	void startup();

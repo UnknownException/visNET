@@ -3,20 +3,22 @@
 #include "packet.h"
 
 namespace visNET{
+	Packet::Packet()
+	{
+		m_nPacketId = 0;
+		writeUInt(m_nPacketId); //First 4 bytes
+		writeUInt(0); //Checksum placeholder
+	}
+
 	Packet::Packet(uint32_t nPacketID)
 	{
 		m_nPacketId = nPacketID;
-		writeUInt(nPacketID); //First 4 bytes
+		writeUInt(m_nPacketId); //First 4 bytes
 		writeUInt(0); //Checksum placeholder
 	}
 
 	Packet::~Packet()
 	{
-	}
-
-	void Packet::finalize()
-	{
-		encrypt();
 	}
 
 	void Packet::encrypt()
@@ -82,5 +84,21 @@ namespace visNET{
 		// Compare checksums
 		if (memcmp(&nChecksum, m_pData + sizeof(uint32_t), sizeof(uint32_t)) != 0)
 			throw std::exception("Packet checksum is broken");
+	}
+
+	void Packet::onReceive(uint8_t* pData, uint32_t nLength)
+	{
+		RawPacket::onReceive(pData, nLength);
+
+		decrypt();
+
+		memcpy(&m_nPacketId, m_pData, sizeof(uint32_t));
+	}
+
+	void Packet::onSend()
+	{
+		RawPacket::onSend();
+
+		encrypt();
 	}
 }
