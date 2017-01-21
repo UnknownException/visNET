@@ -3,6 +3,11 @@
 #include "socket.h"
 
 namespace visNET{
+	enum NetworkType{
+		NT_TCP,
+		NT_UDP,
+	};
+
 	class Listener{
 		Socket m_handle;
 	public:

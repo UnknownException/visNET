@@ -19,7 +19,7 @@ namespace visNET{
 		bool getAlive() { return m_bAlive; }
 
 		void write(const uint8_t* buffer, int32_t size);
-		void write(RawPacket* packet);
+		void write(RawPacket& packet);
 		int32_t read(uint8_t* buffer, int32_t size);
 		bool read(RawPacket& packet);
 	};

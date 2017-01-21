@@ -10,13 +10,11 @@
 
 #include "blobarray.h"
 #include "rawpacket.h"
+#include "packet.h"
+#include "socket.h"
+#include "listener.h"
 
 namespace visNET{
 	void startup();
 	void cleanup();
-
-	enum NetworkType{
-		NT_TCP,
-		NT_UDP,
-	};
 }

@@ -56,6 +56,10 @@ namespace visNET{
 		m_handle.setSocket(s);
 	}
 
+	Listener::~Listener()
+	{
+	}
+
 	bool Listener::setNonBlocking(bool b)
 	{
 		u_long nVal = b ? 1 : 0;

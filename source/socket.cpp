@@ -31,10 +31,10 @@ namespace visNET{
 		return 0;
 	}
 
-	void Socket::write(RawPacket* pPacket)
+	void Socket::write(RawPacket& pPacket)
 	{
-		pPacket->onSend();
-		write(pPacket->getRawData(), pPacket->getRawSize());
+		pPacket.onSend();
+		write(pPacket.getRawData(), pPacket.getRawSize());
 	}
 
 	bool Socket::read(RawPacket& packet)
