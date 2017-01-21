@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Network">
+      <UniqueIdentifier>{f67174dd-dca6-45f8-9538-e12b9b60de54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packet">
+      <UniqueIdentifier>{a46c5f60-39fd-491c-bcd6-96d08b0772cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Structure">
+      <UniqueIdentifier>{3dde649f-4cc2-4047-9032-90823ba0fe83}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="listener.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="visnet.h" />
+    <ClInclude Include="rawpacket.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="blobarray.h">
+      <Filter>Structure</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="listener.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="visnet.cpp" />
+    <ClCompile Include="packet.cpp">
+      <Filter>Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="rawpacket.cpp">
+      <Filter>Packet</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
