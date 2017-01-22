@@ -28,16 +28,19 @@ namespace visNET{
 				sprintf_s(szBuff, sizeof(szBuff), "%i", nPort);
 
 				if (getaddrinfo(NULL, szBuff, &hints, &result) != 0)
-					std::exception("[TCP Listener] getaddrinfo has failed");
+					std::exception("[Listener] getaddrinfo has failed");
 			}
 			break;
 			default:
-				throw std::exception("Invalid NetworkType specified for network listener");
+				throw std::exception("[Listener] Invalid NetworkType specified");
 		}
 
 		SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-		if (s <= 0)
-			throw std::exception("Failed to create listen socket");
+		if (s == INVALID_SOCKET)
+			throw std::exception("[Listener] Failed to create socket");
+
+		if (eType == NT_TCP)
+			freeaddrinfo(result);
 
 		sockaddr_in addr;
 		addr.sin_family = AF_INET;
@@ -45,12 +48,12 @@ namespace visNET{
 		addr.sin_port = htons(nPort);
 
 		if (bind(s, reinterpret_cast<sockaddr*>(&addr), sizeof(sockaddr_in)) < 0)
-			throw std::exception("Failed to bind the socket");
+			throw std::exception("[Listener] Failed to bind the socket");
 
 		if (eType == NT_TCP)
 		{
 			if (listen(s, SOMAXCONN) == SOCKET_ERROR)
-				std::exception("Failed to listen to tcp socket");
+				std::exception("[Listener] Failed to listen to socket");
 		}
 
 		m_handle.setSocket(s);

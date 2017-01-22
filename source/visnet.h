@@ -12,6 +12,7 @@
 #include "packet.h"
 #include "socket.h"
 #include "listener.h"
+#include "client.h"
 
 namespace visNET{
 	void startup();

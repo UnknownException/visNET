@@ -28,6 +28,9 @@
     <ClInclude Include="blobarray.h">
       <Filter>Structure</Filter>
     </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="listener.cpp">
@@ -42,6 +45,9 @@
     </ClCompile>
     <ClCompile Include="rawpacket.cpp">
       <Filter>Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="client.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

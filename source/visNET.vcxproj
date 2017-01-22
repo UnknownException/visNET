@@ -65,6 +65,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="blobarray.h" />
+    <ClInclude Include="client.h" />
     <ClInclude Include="listener.h" />
     <ClInclude Include="packet.h" />
     <ClInclude Include="rawpacket.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="visnet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="client.cpp" />
     <ClCompile Include="listener.cpp" />
     <ClCompile Include="packet.cpp" />
     <ClCompile Include="rawpacket.cpp" />

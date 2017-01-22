@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+	Listener class is the server sided 'listener' which will wait for new client connections
+*/
+
 namespace visNET{
 	enum NetworkType{
 		NT_TCP,
