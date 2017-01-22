@@ -10,7 +10,7 @@ namespace visNET{
 
 	void cleanup()
 	{
-		if (!WSACleanup())
+		if (WSACleanup() != NO_ERROR)
 			throw std::exception("Failed to cleanup WSA");
 	}
 }

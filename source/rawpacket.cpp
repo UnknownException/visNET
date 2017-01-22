@@ -101,7 +101,7 @@ namespace visNET{
 		m_nRead += nBlobCount * blob.getSize();
 	}
 
-	void RawPacket::onReceive(uint8_t* pData, uint32_t nLength)
+	void RawPacket::_onReceive(uint8_t* pData, uint32_t nLength)
 	{
 		if (m_pData)
 		{

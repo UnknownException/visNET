@@ -23,6 +23,7 @@ namespace visNET{
 
 	void Packet::encrypt()
 	{
+		uint8_t* pData = const_cast<uint8_t*>(_getRawData());
 		//The checksum is important for the Packets UDP implementation. 
 		//If the package is damaged, it'll be noticable by verifying the checksum.
 		uint32_t nChecksum = 0; 
@@ -33,15 +34,15 @@ namespace visNET{
 
 		//Obfuscate packet id
 		uint32_t nVal = 0;
-		memcpy(&nVal, m_pData, sizeof(uint32_t));
+		memcpy(&nVal, pData, sizeof(uint32_t));
 		nVal ^= 0xAE;
-		memcpy(m_pData, &nVal, sizeof(uint32_t));
+		memcpy(pData, &nVal, sizeof(uint32_t));
 
 		//Obfuscate packet content
-		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < m_nSize; ++i)
+		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < _getRawSize(); ++i)
 		{
-			nChecksum += m_pData[i];
-			m_pData[i] ^= static_cast<uint8_t>(m_nPacketId); //Only need the lower end of the value
+			nChecksum += pData[i];
+			pData[i] ^= static_cast<uint8_t>(m_nPacketId); //Only need the lower end of the value
 		}
 
 		//Obfuscate generated checksum
@@ -52,26 +53,27 @@ namespace visNET{
 		}
 
 		// Overwrite checksum placeholder in packet data
-		memcpy(m_pData + sizeof(uint32_t), &nChecksum, sizeof(uint32_t));
+		memcpy(pData + sizeof(uint32_t), &nChecksum, sizeof(uint32_t));
 	}
 
 	void Packet::decrypt()
 	{
 		//Advice: Read the comments in the encrypt function
 
+		uint8_t* pData = const_cast<uint8_t*>(_getRawData());
 		uint32_t nChecksum = 0;
 
 		// Obfuscate packet id
 		uint32_t nVal = 0;
-		memcpy(&nVal, m_pData, sizeof(uint32_t)); //Get ID
+		memcpy(&nVal, pData, sizeof(uint32_t)); //Get ID
 		nVal ^= 0xAE;
-		memcpy(m_pData, &nVal, sizeof(uint32_t));
+		memcpy(pData, &nVal, sizeof(uint32_t));
 
 		// Obfuscate packet content
-		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < m_nSize; ++i)
+		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < _getRawSize(); ++i)
 		{
-			m_pData[i] ^= static_cast<uint8_t>(nVal); //Only need the lower end of the value
-			nChecksum += m_pData[i]; // Make checksum based on unobfuscated data
+			pData[i] ^= static_cast<uint8_t>(nVal); //Only need the lower end of the value
+			nChecksum += pData[i]; // Make checksum based on unobfuscated data
 		}
 
 		// Obfuscate comparison checksum checksum
@@ -82,22 +84,23 @@ namespace visNET{
 		}
 
 		// Compare checksums
-		if (memcmp(&nChecksum, m_pData + sizeof(uint32_t), sizeof(uint32_t)) != 0)
+		if (memcmp(&nChecksum, pData + sizeof(uint32_t), sizeof(uint32_t)) != 0)
 			throw std::exception("Packet checksum is broken");
 	}
 
-	void Packet::onReceive(uint8_t* pData, uint32_t nLength)
+	void Packet::_onReceive(uint8_t* pData, uint32_t nLength)
 	{
-		RawPacket::onReceive(pData, nLength);
+		RawPacket::_onReceive(pData, nLength);
 
 		decrypt();
 
-		memcpy(&m_nPacketId, m_pData, sizeof(uint32_t));
+		uint8_t* pPacketData = const_cast<uint8_t*>(_getRawData());
+		memcpy(&m_nPacketId, pPacketData, sizeof(uint32_t));
 	}
 
-	void Packet::onSend()
+	void Packet::_onSend()
 	{
-		RawPacket::onSend();
+		RawPacket::_onSend();
 
 		encrypt();
 	}

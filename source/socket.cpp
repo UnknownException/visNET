@@ -33,13 +33,13 @@ namespace visNET{
 
 	void Socket::write(RawPacket& pPacket)
 	{
-		pPacket.onSend();
-		write(pPacket.getRawData(), pPacket.getRawSize());
+		pPacket._onSend();
+		write(pPacket._getRawData(), pPacket._getRawSize());
 	}
 
 	bool Socket::read(RawPacket& packet)
 	{
-		if (packet.getRawSize() != 0)
+		if (packet._getRawSize() != 0)
 			throw std::exception("Cannot read data into an already filled packet");
 
 		uint8_t buff[512]; // todo : Make buffer a configurable setting
@@ -47,7 +47,7 @@ namespace visNET{
 		if (nSize <= 0)
 			return false;
 
-		packet.onReceive(buff, nSize);
+		packet._onReceive(buff, nSize);
 			
 		return true;
 	}

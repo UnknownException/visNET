@@ -2,23 +2,16 @@
 
 namespace visNET{
 	class RawPacket{
-	protected:
 		uint32_t m_nSize;
 		uint8_t* m_pData;
-	private:
+
 		uint32_t m_nRead;
 	public:
 		RawPacket();
 		virtual ~RawPacket();
 
-		/// If possible, use the predefined writetypes instead of directly writing to the buffer
+		// If possible, use the predefined writetypes instead of directly writing to the buffer
 		void write(const char* data, uint32_t length);
-
-		// If possible, use the predefined readtypes instead of directly reading from the buffer
-		void read(char* buffer, uint32_t size);
-
-		// Skip an amount of bytes in the received packet
-		void readSkip(uint32_t offset);
 
 		void writeInt(int32_t n) { write(reinterpret_cast<char*>(&n), sizeof(int32_t)); }
 		void writeUInt(uint32_t n) { write(reinterpret_cast<char*>(&n), sizeof(uint32_t)); }
@@ -33,6 +26,11 @@ namespace visNET{
 		void writeString(const char* str);
 		void writeString(std::string str) { writeString(str.c_str()); } //Alias
 		void writeBlobArray(BlobArray& blob); // Efficient way to send multiple objects
+
+		// If possible, use the predefined readtypes instead of directly reading from the buffer
+		void read(char* buffer, uint32_t size);
+		// Skip an amount of bytes in the received packet
+		void readSkip(uint32_t offset);
 
 		int32_t readInt(){
 			int32_t n;
@@ -90,10 +88,12 @@ namespace visNET{
 		std::string readString();
 		void readBlobArray(BlobArray& blob);
 
-		const uint8_t* getRawData() { return m_pData; }
-		const uint32_t getRawSize() { return m_nSize; }
+		// Put these near the bottom in intellisense
+		// These _* functions shouldn't get called from any extern program except if declaring a custom packet type
+		const uint8_t* _getRawData() { return m_pData; }
+		const uint32_t _getRawSize() { return m_nSize; }
 
-		virtual void onReceive(uint8_t* pData, uint32_t nLength); //Gets called after receiving
-		virtual void onSend() {}; //Gets called before being send
+		virtual void _onReceive(uint8_t* pData, uint32_t nLength); //Gets called after receiving
+		virtual void _onSend() {}; //Gets called before being send
 	};
 }
