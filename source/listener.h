@@ -1,7 +1,5 @@
 #pragma once
 
-#include "socket.h"
-
 namespace visNET{
 	enum NetworkType{
 		NT_TCP,
@@ -14,7 +12,7 @@ namespace visNET{
 		Listener(NetworkType eType, uint16_t nPort);
 		virtual ~Listener();
 
-		bool setNonBlocking(bool b);
-		std::vector<Socket*> getConnections();
+		bool setNonBlocking(bool b) { m_handle.setNonBlocking(b); }
+		Socket getConnection();
 	};
 }

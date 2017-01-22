@@ -16,6 +16,9 @@ namespace visNET{
 		void setSocket(SOCKET s) { m_handle = s; }
 		SOCKET getSocket() { return m_handle; }
 
+		bool setNonBlocking(bool b);
+
+		void setAlive(bool b) { m_bAlive = b; }
 		bool getAlive() { return m_bAlive; }
 
 		void write(const uint8_t* buffer, int32_t size);

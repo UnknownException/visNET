@@ -60,28 +60,12 @@ namespace visNET{
 	{
 	}
 
-	bool Listener::setNonBlocking(bool b)
+	Socket Listener::getConnection()
 	{
-		u_long nVal = b ? 1 : 0;
+		Socket s(accept(m_handle.getSocket(), nullptr, nullptr));
+		if (s.getSocket() == INVALID_SOCKET)
+			s.setAlive(false); //Invalid socket, set dead
 
-		if (ioctlsocket(m_handle.getSocket(), FIONBIO, &nVal) != 0)
-			return false;
-
-		return true;
-	}
-
-	std::vector<Socket*> Listener::getConnections()
-	{
-		std::vector<Socket*> vecClients;
-
-		SOCKET s = accept(m_handle.getSocket(), nullptr, nullptr);
-		while (s != INVALID_SOCKET)
-		{
-			vecClients.push_back(new Socket(s));
-
-			s = accept(m_handle.getSocket(), nullptr, nullptr);
-		}
-
-		return vecClients;
+		return s;
 	}
 }

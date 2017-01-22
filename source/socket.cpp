@@ -12,6 +12,16 @@ namespace visNET{
 		closesocket(m_handle);
 	}
 
+	bool Socket::setNonBlocking(bool b)
+	{
+		u_long nVal = b ? 1 : 0;
+
+		if (ioctlsocket(m_handle, FIONBIO, &nVal) != 0)
+			return false;
+
+		return true;
+	}
+
 	void Socket::write(const uint8_t* pBuffer, int32_t nSize)
 	{
 		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
