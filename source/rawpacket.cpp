@@ -68,7 +68,7 @@ namespace visNET{
 		writeUInt(blob.getCount());
 
 		if (blob.getCount() > 0)
-			write(reinterpret_cast<char*>(blob.read(0)), blob.getTotalSize());
+			write(reinterpret_cast<char*>(blob.getIndexPtr(0)), blob.getArraySize());
 	}
 
 	std::string RawPacket::readString()
@@ -92,13 +92,13 @@ namespace visNET{
 
 		uint32_t nBlobCount = readUInt();
 
-		if (m_nRead + (nBlobCount * blob.getSize()) > m_nSize)
+		if (m_nRead + (nBlobCount * blob.getBlobSize()) > m_nSize)
 			throw std::exception("Cannot read more data than the buffer contains");
 
 		if (nBlobCount > 0)
 			blob.add(m_pData + m_nRead, nBlobCount);
 
-		m_nRead += nBlobCount * blob.getSize();
+		m_nRead += nBlobCount * blob.getBlobSize();
 	}
 
 	void RawPacket::_onReceive(uint8_t* pData, uint32_t nLength)
