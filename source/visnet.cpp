@@ -1,16 +1,14 @@
 #include "visnet.h"
 
 namespace visNET{
-	void startup()
+	bool startup()
 	{
 		WSADATA wsaData;
-		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
-			throw std::exception("Failed to initialize WSA");
+		return (WSAStartup(MAKEWORD(2, 2), &wsaData) == NO_ERROR);
 	}
 
-	void cleanup()
+	bool cleanup()
 	{
-		if (WSACleanup() != NO_ERROR)
-			throw std::exception("Failed to cleanup WSA");
+		return (WSACleanup() == NO_ERROR);
 	}
 }

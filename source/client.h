@@ -8,6 +8,8 @@
 namespace visNET{
 	class Client{
 		Socket m_handle;
+		bool m_bValid; // If not valid, the Listener hasn't been created.
+		std::string m_strError;
 	public:
 		Client(NetworkType eType, const char* pszIp, uint16_t nPort);
 		virtual ~Client();
@@ -16,5 +18,10 @@ namespace visNET{
 		void write(RawPacket& packet) { m_handle.write(packet); }
 		int32_t read(uint8_t* buffer, int32_t size) { return m_handle.read(buffer, size); }
 		bool read(RawPacket& packet) { return m_handle.read(packet); }
+
+		bool isValid() { return m_bValid; }
+		const std::string getError() { return m_strError; }
+	private:
+		void setError(const char* pszError) { m_strError = pszError; }
 	};
 }

@@ -4,6 +4,8 @@
 namespace visNET{
 	Client::Client(NetworkType eType, const char* pszIp, uint16_t nPort)
 	{
+		m_bValid = false;
+
 		addrinfo hints, *result;
 		ZeroMemory(&hints, sizeof(addrinfo));
 		hints.ai_family = AF_INET;
@@ -27,18 +29,27 @@ namespace visNET{
 				sprintf_s(szBuff, sizeof(szBuff), "%i", nPort);
 
 				if (getaddrinfo(pszIp, szBuff, &hints, &result) != 0)
-					std::exception("[Client] getaddrinfo has failed");
+				{
+					setError("[Client] getaddrinfo has failed");
+					return;
+				}
 			}
 			break;
 			default:
-				throw std::exception("[Client] Invalid NetworkType specified");
+			{
+				setError("[Client] Invalid NetworkType specified");
+				return;
+			}
 		}
 
 		for (auto it = result; it != nullptr; it = it->ai_next)
 		{
 			SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 			if (s == INVALID_SOCKET)
-				throw std::exception("[Client] Failed to create socket");
+			{
+				setError("[Client] Failed to create socket");
+				return;
+			}
 
 			if (eType == NT_TCP)
 			{
@@ -60,6 +71,11 @@ namespace visNET{
 			freeaddrinfo(result);
 
 		if (m_handle.getSocket() == INVALID_SOCKET)
-			throw std::exception("[Client] Failed to connect to a socket");
+		{
+			setError("[Client] Failed to connect to a socket");
+			return;
+		}
+
+		m_bValid = true;
 	}
 }

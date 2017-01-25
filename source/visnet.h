@@ -15,6 +15,6 @@
 #include "client.h"
 
 namespace visNET{
-	void startup();
-	void cleanup();
+	bool startup();
+	bool cleanup();
 }
