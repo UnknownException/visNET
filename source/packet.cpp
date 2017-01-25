@@ -56,7 +56,7 @@ namespace visNET{
 		memcpy(pData + sizeof(uint32_t), &nChecksum, sizeof(uint32_t));
 	}
 
-	void Packet::decrypt()
+	bool Packet::decrypt()
 	{
 		//Advice: Read the comments in the encrypt function
 
@@ -85,17 +85,24 @@ namespace visNET{
 
 		// Compare checksums
 		if (memcmp(&nChecksum, pData + sizeof(uint32_t), sizeof(uint32_t)) != 0)
-			throw std::exception("Packet checksum is broken");
+			return false;
+
+		return true;
 	}
 
-	void Packet::_onReceive(uint8_t* pData, uint32_t nLength)
+	bool Packet::_onReceive(uint8_t* pData, uint32_t nLength)
 	{
-		RawPacket::_onReceive(pData, nLength);
+		if (RawPacket::_onReceive(pData, nLength))
+			return false;
 
-		decrypt();
+		// If we can't decrypt the packet, it is invalid.
+		if (!decrypt())
+			return false;
 
 		uint8_t* pPacketData = const_cast<uint8_t*>(_getRawData());
 		memcpy(&m_nPacketId, pPacketData, sizeof(uint32_t));
+
+		return true;
 	}
 
 	void Packet::_onSend()

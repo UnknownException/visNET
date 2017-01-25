@@ -49,15 +49,17 @@ namespace visNET{
 
 	bool Socket::read(RawPacket& packet)
 	{
+		// Cannot read data into an already filled packet
 		if (packet._getRawSize() != 0)
-			throw std::exception("Cannot read data into an already filled packet");
+			return false;
 
 		uint8_t buff[512]; // todo : Make buffer a configurable setting
 		int32_t nSize = read(buff, sizeof(buff));
 		if (nSize <= 0)
 			return false;
 
-		packet._onReceive(buff, nSize);
+		if (!packet._onReceive(buff, nSize))
+			return false;
 			
 		return true;
 	}

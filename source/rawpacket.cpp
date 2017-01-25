@@ -9,6 +9,7 @@ namespace visNET{
 
 		//Not used when building a packet...
 		m_nRead = 0;
+		m_bValidRead = false; // Will block further reading if the content that is being read is invalid
 	}
 
 	RawPacket::~RawPacket()
@@ -28,28 +29,38 @@ namespace visNET{
 		m_nSize += nLength;
 	}
 
-	void RawPacket::read(char* pBuffer, uint32_t nSize)
+	bool RawPacket::read(char* pBuffer, uint32_t nSize)
 	{
-		if (!m_pData)
-			throw std::exception("Cannot read from an uninitialized packet");
+		if (!m_bValidRead)
+			return false;
 
-		if (m_nRead + nSize > m_nSize)
-			throw std::exception("Cannot read more data than the buffer contains");
+		if (!m_pData || m_nRead + nSize > m_nSize) // Can't read without data or outside bounds
+		{
+			m_bValidRead = false;
+			return false;
+		}
 
 		memcpy(pBuffer, m_pData + m_nRead, nSize);
 
 		m_nRead += nSize;
+
+		return true;
 	}
 
-	void RawPacket::readSkip(uint32_t nOffset)
+	bool RawPacket::readSkip(uint32_t nOffset)
 	{
-		if (!m_pData)
-			throw std::exception("Cannot read from an uninitialized packet");
+		if (!m_bValidRead)
+			return false;
 
-		if (m_nRead + nOffset > m_nSize)
-			throw std::exception("Cannot read more data than the buffer contains");
+		if (!m_pData || m_nRead + nOffset > m_nSize) // Can't read without data or outside of bounds
+		{
+			m_bValidRead = false;
+			return false;
+		}
 
 		m_nRead += nOffset;
+
+		return true;
 	}
 
 	void RawPacket::writeString(const char* str)
@@ -74,44 +85,61 @@ namespace visNET{
 	std::string RawPacket::readString()
 	{
 		uint32_t nLen = readUInt();
-		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
+		if (!m_bValidRead)
+			return "";
 
-		read(reinterpret_cast<char*>(pBuffer), sizeof(pBuffer));
+		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
+		if (!read(reinterpret_cast<char*>(pBuffer), sizeof(pBuffer)))
+			return "";
+
 		pBuffer[nLen] = 0;
 
 		return std::string(reinterpret_cast<char*>(pBuffer));
 	}
 
-	void RawPacket::readBlobArray(BlobArray& blob)
+	bool RawPacket::readBlobArray(BlobArray& blob)
 	{
-		if (!m_pData)
-			throw std::exception("Cannot read from an uninitialized packet");
+		if (!m_bValidRead)
+			return false;
 
-		if (blob.getCount() != 0)
-			throw std::exception("Trying to read into an already filled blob");
+		if (!m_pData || blob.getCount() != 0) // Can't read without data or in an already filled blob
+		{
+			m_bValidRead = false;
+			return false;
+		}
 
 		uint32_t nBlobCount = readUInt();
+		if (!m_bValidRead)
+			return false;
 
+		// Can't read more data than the packet buffer contains
 		if (m_nRead + (nBlobCount * blob.getBlobSize()) > m_nSize)
-			throw std::exception("Cannot read more data than the buffer contains");
+		{
+			m_bValidRead = false;
+			return false;
+		}
 
 		if (nBlobCount > 0)
 			blob.add(m_pData + m_nRead, nBlobCount);
 
 		m_nRead += nBlobCount * blob.getBlobSize();
+
+		return true;
 	}
 
-	void RawPacket::_onReceive(uint8_t* pData, uint32_t nLength)
+	bool RawPacket::_onReceive(uint8_t* pData, uint32_t nLength)
 	{
+		// Can't read into an already filled packet
 		if (m_pData)
-		{
-			delete[] m_pData;
-			m_nRead = 0;
-		}
+			return false;
 
 		m_pData = new uint8_t[nLength];
 		m_nSize = nLength;
 
 		memcpy(m_pData, pData, nLength);
+
+		m_bValidRead = true; //Allow to read from the packet
+
+		return true;
 	}
 }
