@@ -22,11 +22,13 @@ namespace visNET{
 		return true;
 	}
 
-	void Socket::write(const uint8_t* pBuffer, int32_t nSize)
+	bool Socket::write(const uint8_t* pBuffer, int32_t nSize)
 	{
 		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
 		if (nRetn == SOCKET_ERROR)
 			m_bAlive = false;
+
+		return m_bAlive;
 	}
 
 	int32_t Socket::read(uint8_t* pBuffer, int32_t nSize)
@@ -41,10 +43,10 @@ namespace visNET{
 		return 0;
 	}
 
-	void Socket::write(RawPacket& pPacket)
+	bool Socket::write(RawPacket& pPacket)
 	{
 		pPacket._onSend();
-		write(pPacket._getRawData(), pPacket._getRawSize());
+		return write(pPacket._getRawData(), pPacket._getRawSize());
 	}
 
 	bool Socket::read(RawPacket& packet)

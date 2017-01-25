@@ -58,6 +58,7 @@ namespace visNET{
 				{
 					closesocket(s);
 					s = INVALID_SOCKET;
+					m_handle.setSocket(s);
 					continue;
 				}
 			}
@@ -77,5 +78,9 @@ namespace visNET{
 		}
 
 		m_bValid = true;
+	}
+
+	Client::~Client()
+	{
 	}
 }
