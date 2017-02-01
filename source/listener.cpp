@@ -84,10 +84,11 @@ namespace visNET{
 
 	Socket Listener::getConnection()
 	{
-		Socket s(accept(m_handle.getSocket(), nullptr, nullptr));
-		if (s.getSocket() == INVALID_SOCKET)
-			s.setAlive(false); //Invalid socket, set dead
+		Socket* s = new Socket();
+		s->setSocket(accept(m_handle.getSocket(), nullptr, nullptr));
+		if (s->getSocket() == INVALID_SOCKET)
+			s->setAlive(false);
 
-		return s;
+		return *s;
 	}
 }

@@ -8,11 +8,6 @@ namespace visNET{
 		Socket();
 		virtual ~Socket();
 
-		Socket(SOCKET s) {
-			Socket();
-			setSocket(s);
-		}
-
 		void setSocket(SOCKET s) { m_handle = s; }
 		SOCKET getSocket() { return m_handle; }
 

@@ -89,7 +89,7 @@ namespace visNET{
 			return "";
 
 		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
-		if (!read(reinterpret_cast<char*>(pBuffer), sizeof(pBuffer)))
+		if (!read(reinterpret_cast<char*>(pBuffer), nLen))
 			return "";
 
 		pBuffer[nLen] = 0;
