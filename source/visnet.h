@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <memory>
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>

@@ -82,13 +82,13 @@ namespace visNET{
 	{
 	}
 
-	Socket Listener::getConnection()
+	std::shared_ptr<Socket> Listener::getConnection()
 	{
-		Socket* s = new Socket();
+		std::shared_ptr<Socket> s = std::make_shared<Socket>();
 		s->setSocket(accept(m_handle.getSocket(), nullptr, nullptr));
 		if (s->getSocket() == INVALID_SOCKET)
 			s->setAlive(false);
 
-		return *s;
+		return s;
 	}
 }
