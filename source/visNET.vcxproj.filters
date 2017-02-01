@@ -10,6 +10,9 @@
     <Filter Include="Structure">
       <UniqueIdentifier>{3dde649f-4cc2-4047-9032-90823ba0fe83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helper">
+      <UniqueIdentifier>{9f8024d8-9740-4c95-9120-fb06435f0539}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="listener.h">
@@ -31,6 +34,9 @@
     <ClInclude Include="client.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="socketpool.h">
+      <Filter>Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="listener.cpp">
@@ -48,6 +54,9 @@
     </ClCompile>
     <ClCompile Include="client.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="socketpool.cpp">
+      <Filter>Helper</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

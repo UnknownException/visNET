@@ -14,6 +14,9 @@
 #include "socket.h"
 #include "listener.h"
 #include "client.h"
+#ifdef _visNET_SOCKETPOOL
+#include "socketpool.h"
+#endif
 
 namespace visNET{
 	bool startup();

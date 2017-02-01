@@ -82,9 +82,9 @@ namespace visNET{
 	{
 	}
 
-	std::shared_ptr<Socket> Listener::getConnection()
+	std::unique_ptr<Socket> Listener::getConnection()
 	{
-		std::shared_ptr<Socket> s = std::make_shared<Socket>();
+		std::unique_ptr<Socket> s = std::make_unique<Socket>();
 		s->setSocket(accept(m_handle.getSocket(), nullptr, nullptr));
 		if (s->getSocket() == INVALID_SOCKET)
 			s->setAlive(false);

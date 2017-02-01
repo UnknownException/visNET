@@ -19,7 +19,7 @@ namespace visNET{
 		virtual ~Listener();
 
 		bool setNonBlocking(bool b) { m_handle.setNonBlocking(b); }
-		std::shared_ptr<Socket> getConnection();
+		std::unique_ptr<Socket> getConnection();
 
 		bool isValid() { return m_bValid; }
 		const std::string getError() { return m_strError; }
