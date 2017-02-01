@@ -58,7 +58,6 @@ namespace visNET{
 				{
 					closesocket(s);
 					s = INVALID_SOCKET;
-					m_handle.setSocket(s);
 					continue;
 				}
 			}

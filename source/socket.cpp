@@ -4,6 +4,7 @@
 namespace visNET{
 	Socket::Socket()
 	{
+		m_handle = INVALID_SOCKET;
 		m_bAlive = true;
 	}
 
