@@ -18,7 +18,8 @@ namespace visNET{
 			delete[] m_pData;
 	}
 
-	void RawPacket::write(const char* pData, uint32_t nLength)
+	template<typename T>
+	void RawPacket::write(const T* pData, uint32_t nLength)
 	{
 		if (!m_pData)
 			m_pData = new uint8_t[nLength];
@@ -29,7 +30,29 @@ namespace visNET{
 		m_nSize += nLength;
 	}
 
-	bool RawPacket::read(char* pBuffer, uint32_t nSize)
+	void RawPacket::writeString(const char* str)
+	{
+		uint32_t nLen = strlen(str);
+		
+		uint8_t* pBuffer = new uint8_t[nLen];
+		memcpy(pBuffer, str, nLen);
+
+		writeUInt(nLen);
+		write(pBuffer, nLen);
+	}
+
+#ifndef _visNET_EXCLUDE_BLOBARRAY
+	void RawPacket::writeBlobArray(BlobArray& blob)
+	{
+		writeUInt(blob.getCount());
+
+		if (blob.getCount() > 0)
+			write(blob.getIndexPtr(0), blob.getArraySize());
+	}
+#endif
+
+	template<typename T>
+	bool RawPacket::read(T* pBuffer, uint32_t nSize)
 	{
 		if (!m_bValidRead)
 			return false;
@@ -63,25 +86,6 @@ namespace visNET{
 		return true;
 	}
 
-	void RawPacket::writeString(const char* str)
-	{
-		uint32_t nLen = strlen(str);
-		
-		uint8_t* pBuffer = new uint8_t[nLen];
-		memcpy(pBuffer, str, nLen);
-
-		writeUInt(nLen);
-		write(reinterpret_cast<char*>(pBuffer), nLen);
-	}
-
-	void RawPacket::writeBlobArray(BlobArray& blob)
-	{
-		writeUInt(blob.getCount());
-
-		if (blob.getCount() > 0)
-			write(reinterpret_cast<char*>(blob.getIndexPtr(0)), blob.getArraySize());
-	}
-
 	std::string RawPacket::readString()
 	{
 		uint32_t nLen = readUInt();
@@ -89,7 +93,7 @@ namespace visNET{
 			return "";
 
 		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
-		if (!read(reinterpret_cast<char*>(pBuffer), nLen))
+		if (!read(pBuffer, nLen))
 			return "";
 
 		pBuffer[nLen] = 0;
@@ -97,6 +101,7 @@ namespace visNET{
 		return std::string(reinterpret_cast<char*>(pBuffer));
 	}
 
+#ifndef _visNET_EXCLUDE_BLOBARRAY
 	bool RawPacket::readBlobArray(BlobArray& blob)
 	{
 		if (!m_bValidRead)
@@ -126,6 +131,7 @@ namespace visNET{
 
 		return true;
 	}
+#endif
 
 	bool RawPacket::_onReceive(uint8_t* pData, uint32_t nLength)
 	{

@@ -14,9 +14,12 @@ namespace visNET{
 		Client(NetworkType eType, const char* pszIp, uint16_t nPort);
 		virtual ~Client();
 
-		bool write(const uint8_t* buffer, int32_t size) { return m_handle.write(buffer, size); }
+		template <typename T>
+		bool write(const T* buffer, int32_t size) { return m_handle.write(buffer, size); }
 		bool write(RawPacket& packet) { return m_handle.write(packet); }
-		int32_t read(uint8_t* buffer, int32_t size) { return m_handle.read(buffer, size); }
+
+		template <typename T>
+		int32_t read(T* buffer, int32_t size) { return m_handle.read(buffer, size); }
 		bool read(RawPacket& packet) { return m_handle.read(packet); }
 
 		bool isValid() { return m_bValid; }

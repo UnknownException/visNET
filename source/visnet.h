@@ -8,13 +8,15 @@
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
+#ifndef _visNET_EXCLUDE_BLOBARRAY
 #include "blobarray.h"
+#endif
 #include "rawpacket.h"
 #include "packet.h"
 #include "socket.h"
 #include "listener.h"
 #include "client.h"
-#ifdef _visNET_SOCKETPOOL
+#ifndef _visNET_EXCLUDE_SOCKETPOOL
 #include "socketpool.h"
 #endif
 

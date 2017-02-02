@@ -76,6 +76,8 @@ namespace visNET{
 		m_handle.setSocket(s);
 
 		m_bValid = true;
+
+		m_eType = eType;
 	}
 
 	Listener::~Listener()
@@ -84,6 +86,9 @@ namespace visNET{
 
 	std::unique_ptr<Socket> Listener::getConnection()
 	{
+		if (m_eType != NT_TCP)
+			return nullptr;
+
 		std::unique_ptr<Socket> s = std::make_unique<Socket>();
 		s->setSocket(accept(m_handle.getSocket(), nullptr, nullptr));
 		if (s->getSocket() == INVALID_SOCKET)

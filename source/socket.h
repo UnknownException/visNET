@@ -16,9 +16,12 @@ namespace visNET{
 		void setAlive(bool b) { m_bAlive = b; }
 		bool getAlive() { return m_bAlive; }
 
-		bool write(const uint8_t* buffer, int32_t size);
+		template <typename T>
+		bool write(const T* buffer, int32_t size);
 		bool write(RawPacket& packet);
-		int32_t read(uint8_t* buffer, int32_t size);
+
+		template <typename T>
+		int32_t read(T* buffer, int32_t size);
 		bool read(RawPacket& packet);
 	};
 }

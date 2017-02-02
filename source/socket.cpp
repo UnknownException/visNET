@@ -23,7 +23,8 @@ namespace visNET{
 		return true;
 	}
 
-	bool Socket::write(const uint8_t* pBuffer, int32_t nSize)
+	template <typename T>
+	bool Socket::write(const T* pBuffer, int32_t nSize)
 	{
 		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
 		if (nRetn == SOCKET_ERROR)
@@ -32,9 +33,15 @@ namespace visNET{
 		return m_bAlive;
 	}
 
-	int32_t Socket::read(uint8_t* pBuffer, int32_t nSize)
+	bool Socket::write(RawPacket& pPacket)
 	{
-		ZeroMemory(pBuffer, nSize);
+		pPacket._onSend();
+		return write(pPacket._getRawData(), pPacket._getRawSize());
+	}
+
+	template <typename T>
+	int32_t Socket::read(T* pBuffer, int32_t nSize)
+	{
 		int32_t nRetn = recv(m_handle, reinterpret_cast<char*>(pBuffer), nSize, 0);
 		if (nRetn == 0)
 			m_bAlive = false;
@@ -42,12 +49,6 @@ namespace visNET{
 			return nRetn;
 	
 		return 0;
-	}
-
-	bool Socket::write(RawPacket& pPacket)
-	{
-		pPacket._onSend();
-		return write(pPacket._getRawData(), pPacket._getRawSize());
 	}
 
 	bool Socket::read(RawPacket& packet)
