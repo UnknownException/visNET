@@ -12,8 +12,13 @@ namespace visNET{
 		virtual ~RawPacket();
 
 		// If possible, use the predefined writetypes instead of directly writing to the buffer
+	private:
+		void _write(const uint8_t* data, uint32_t length);
+	public:
 		template<typename T>
-		void write(const T* data, uint32_t length);
+		void write(const T* data, uint32_t length){
+			_write(reinterpret_cast<const uint8_t*>(data), length);
+		}
 
 		void writeInt(int32_t n) { write(&n, sizeof(int32_t)); }
 		void writeUInt(uint32_t n) { write(&n, sizeof(uint32_t)); }
@@ -32,8 +37,14 @@ namespace visNET{
 #endif
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
+	private:
+		bool _read(uint8_t* buffer, uint32_t size);
+	public:
 		template<typename T>
-		bool read(T* buffer, uint32_t size);
+		bool read(T* buffer, uint32_t size){
+			return _read(reinterpret_cast<uint8_t*>(buffer), size);
+		}
+
 		// Skip an amount of bytes in the received packet
 		bool readSkip(uint32_t offset);
 

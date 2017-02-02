@@ -18,8 +18,7 @@ namespace visNET{
 			delete[] m_pData;
 	}
 
-	template<typename T>
-	void RawPacket::write(const T* pData, uint32_t nLength)
+	void RawPacket::_write(const uint8_t* pData, uint32_t nLength)
 	{
 		if (!m_pData)
 			m_pData = new uint8_t[nLength];
@@ -51,8 +50,7 @@ namespace visNET{
 	}
 #endif
 
-	template<typename T>
-	bool RawPacket::read(T* pBuffer, uint32_t nSize)
+	bool RawPacket::_read(uint8_t* pBuffer, uint32_t nSize)
 	{
 		if (!m_bValidRead)
 			return false;

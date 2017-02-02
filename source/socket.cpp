@@ -23,32 +23,10 @@ namespace visNET{
 		return true;
 	}
 
-	template <typename T>
-	bool Socket::write(const T* pBuffer, int32_t nSize)
-	{
-		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
-		if (nRetn == SOCKET_ERROR)
-			m_bAlive = false;
-
-		return m_bAlive;
-	}
-
 	bool Socket::write(RawPacket& pPacket)
 	{
 		pPacket._onSend();
-		return write(pPacket._getRawData(), pPacket._getRawSize());
-	}
-
-	template <typename T>
-	int32_t Socket::read(T* pBuffer, int32_t nSize)
-	{
-		int32_t nRetn = recv(m_handle, reinterpret_cast<char*>(pBuffer), nSize, 0);
-		if (nRetn == 0)
-			m_bAlive = false;
-		else if (nRetn > 0)
-			return nRetn;
-	
-		return 0;
+		return _write(reinterpret_cast<const char*>(pPacket._getRawData()), pPacket._getRawSize());
 	}
 
 	bool Socket::read(RawPacket& packet)
@@ -58,7 +36,7 @@ namespace visNET{
 			return false;
 
 		uint8_t buff[512]; // todo : Make buffer a configurable setting
-		int32_t nSize = read(buff, sizeof(buff));
+		int32_t nSize = _read(reinterpret_cast<char*>(&buff), sizeof(buff));
 		if (nSize <= 0)
 			return false;
 
@@ -66,5 +44,25 @@ namespace visNET{
 			return false;
 			
 		return true;
+	}
+
+	bool Socket::_write(const char* pBuffer, int32_t nSize)
+	{
+		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
+		if (nRetn == SOCKET_ERROR)
+			m_bAlive = false;
+
+		return m_bAlive;
+	}
+
+	int32_t Socket::_read(char* pBuffer, int32_t nSize)
+	{
+		int32_t nRetn = recv(m_handle, reinterpret_cast<char*>(pBuffer), nSize, 0);
+		if (nRetn == 0)
+			m_bAlive = false;
+		else if (nRetn > 0)
+			return nRetn;
+
+		return 0;
 	}
 }
