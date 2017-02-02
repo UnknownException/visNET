@@ -7,6 +7,8 @@ namespace visNET{
 		m_bPacketsAvailable = false;
 		m_bRun = true;
 
+		m_nSocketID = 0;
+
 		m_pThread = std::make_unique<std::thread>(&SocketPool::run, this);
 	}
 
@@ -16,28 +18,46 @@ namespace visNET{
 		m_pThread->join();
 	}
 
+	auto SocketPool::getFreeID() -> decltype(m_nSocketID)
+	{ 
+		//Should only be accessed from the ::run thread
+		decltype(m_nSocketID) id = 0;
+
+		if (m_queReserveID.empty())
+			id = m_nSocketID++;
+		else
+		{
+			id = m_queReserveID.front();
+			m_queReserveID.pop();
+		}
+
+		return id;
+	}
+
 	bool SocketPool::addSocket(std::unique_ptr<Socket> s)
 	{
 		if (s->getSocket() == INVALID_SOCKET)
 			return false;
 
-		m_mutNewConnection.lock();
-			m_vecNewConnection.push_back(std::move(s));
-		m_mutNewConnection.unlock();
+		m_mutNewSockets.lock();
+			m_vecNewSockets.push_back(std::move(s));
+		m_mutNewSockets.unlock();
 
 		return true;
 	}
 
-	std::vector<RawPacket> SocketPool::getPackets()
+	auto SocketPool::getPackets() -> decltype(m_vecPackets)
 	{
-		std::vector<RawPacket> packets;
+		decltype(m_vecPackets) packets;
 
 		if (!m_bPacketsAvailable)
 			return packets;
 
-		m_mutPacketReady.lock();
-			packets.swap(m_vecPacketReady);
-		m_mutPacketReady.unlock();
+		m_mutPackets.lock();
+			packets.swap(m_vecPackets);
+		m_mutPackets.unlock();
+
+		m_bPacketsAvailable = false;
 
 		return packets;
 	}
@@ -46,29 +66,33 @@ namespace visNET{
 	{
 		while (m_bRun)
 		{
-			m_mutNewConnection.lock();
-				for (auto it = m_vecNewConnection.begin(); it != m_vecNewConnection.end(); ++it)
-					m_vecConnected.push_back(std::move(*it));
+			m_mutNewSockets.lock();
+				for (auto it = m_vecNewSockets.begin(); it != m_vecNewSockets.end(); ++it)
+					m_vecSockets.push_back(std::make_pair(getFreeID(), std::move(*it)));
 
-				m_vecNewConnection.clear();
-			m_mutNewConnection.unlock();
+				m_vecNewSockets.clear();
+			m_mutNewSockets.unlock();
 
-			std::vector<RawPacket> packets;
-			for (auto it = m_vecConnected.begin(); it != m_vecConnected.end(); )
+			decltype(m_vecPackets) packets;
+			for (auto it = m_vecSockets.begin(); it != m_vecSockets.end();)
 			{
-				RawPacket packet;
-				if ((*it)->read(packet))
-					packets.push_back(packet);
-
-				if (!(*it)->getAlive())
-					it = m_vecConnected.erase(it);
+				auto packet = std::make_shared<RawPacket>();
+				if ((*it).second->read(*packet))
+					packets.push_back(std::make_pair((*it).first, packet));
+				
+				if (!(*it).second->getAlive())
+				{
+					m_queReserveID.push((*it).first);
+					it = m_vecSockets.erase(it);
+				}
 				else
 					++it;
 			}
 		
-			m_mutPacketReady.lock();
-				m_vecPacketReady.insert(m_vecPacketReady.end(), packets.begin(), packets.end());
-			m_mutPacketReady.unlock();
+			m_mutPackets.lock();
+				m_vecPackets.insert(m_vecPackets.end(), packets.begin(), packets.end());
+				m_bPacketsAvailable = !m_vecPackets.empty();
+			m_mutPackets.unlock();
 		}
 	}
 }

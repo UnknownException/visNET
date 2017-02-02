@@ -4,18 +4,20 @@
 #include <mutex>
 #include <thread>
 #include <algorithm>
+#include <queue>
 
 namespace visNET{
 	class SocketPool{
+		uint32_t m_nSocketID;
+		std::queue<decltype(m_nSocketID)> m_queReserveID;
+
 		std::atomic<bool> m_bPacketsAvailable;
+		std::mutex m_mutPackets;
+		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<RawPacket>>> m_vecPackets;
 
-		std::mutex m_mutPacketReady;
-		std::vector<RawPacket> m_vecPacketReady;
-
-		std::mutex m_mutNewConnection;
-		std::vector<std::unique_ptr<Socket>> m_vecNewConnection;
-
-		std::vector<std::unique_ptr<Socket>> m_vecConnected;
+		std::mutex m_mutNewSockets;
+		std::vector<std::unique_ptr<Socket>> m_vecNewSockets;
+		std::vector<std::pair<decltype(m_nSocketID), std::unique_ptr<Socket>>> m_vecSockets;
 
 		std::atomic<bool> m_bRun;
 		std::unique_ptr<std::thread> m_pThread;
@@ -23,8 +25,11 @@ namespace visNET{
 		SocketPool();
 		virtual ~SocketPool();
 
+	private:
+		auto getFreeID() -> decltype(m_nSocketID);
+	public:
 		bool addSocket(std::unique_ptr<Socket> s);
-		std::vector<RawPacket> getPackets();
+		auto getPackets() -> decltype(m_vecPackets);
 
 	private:
 		void run();
