@@ -55,8 +55,5 @@
     <ClCompile Include="client.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="socketpool.cpp">
-      <Filter>Helper</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

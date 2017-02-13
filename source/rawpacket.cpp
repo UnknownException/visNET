@@ -33,11 +33,8 @@ namespace visNET{
 	{
 		uint32_t nLen = strlen(str);
 		
-		uint8_t* pBuffer = new uint8_t[nLen];
-		memcpy(pBuffer, str, nLen);
-
 		writeUInt(nLen);
-		write(pBuffer, nLen);
+		write(str, nLen);
 	}
 
 #ifndef _visNET_EXCLUDE_BLOBARRAY
@@ -96,7 +93,11 @@ namespace visNET{
 
 		pBuffer[nLen] = 0;
 
-		return std::string(reinterpret_cast<char*>(pBuffer));
+		std::string result(std::string(reinterpret_cast<char*>(pBuffer)));
+
+		delete[] pBuffer;
+
+		return result;
 	}
 
 #ifndef _visNET_EXCLUDE_BLOBARRAY
