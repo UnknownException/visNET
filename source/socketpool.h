@@ -177,7 +177,15 @@ namespace visNET{
 			m_bPacketsAvailable = !m_vecRecvPackets.empty();
 			m_mutRecvPackets.unlock();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			if(m_mutSendPackets.try_lock())
+			{ 
+				// No packets available to send
+				bool bEmpty = m_vecSendPackets.empty();
+				m_mutSendPackets.unlock(); // Don't keep lock
+
+				if(!bEmpty)
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
 		}
 	}
 }

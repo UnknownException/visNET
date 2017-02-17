@@ -66,6 +66,8 @@ namespace visNET{
 
 		if (eType == NT_TCP)
 		{
+			freeaddrinfo(result);
+
 			if (listen(s, SOMAXCONN) == SOCKET_ERROR)
 			{
 				setError("[Listener] Failed to listen to the socket (TCP)");
