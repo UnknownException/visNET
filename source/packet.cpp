@@ -1,114 +1,211 @@
 #include "visnet.h"
-#include "rawpacket.h"
 #include "packet.h"
 
 namespace visNET{
 	Packet::Packet()
 	{
-		m_nPacketId = 0;
-		writeUInt(m_nPacketId); //First 4 bytes
-		writeUInt(0); //Checksum placeholder
-	}
+		m_nSize = 0;
+		m_pData = nullptr;
 
-	Packet::Packet(uint32_t nPacketID)
-	{
-		m_nPacketId = nPacketID;
-		writeUInt(m_nPacketId); //First 4 bytes
-		writeUInt(0); //Checksum placeholder
+		m_nCursor = 0;
+		m_eState = PS_WRITABLE;
+
+		writeUInt(0); // First 32 bits in the packet are the packets size
 	}
 
 	Packet::~Packet()
 	{
+		if (m_pData)
+			delete[] m_pData;
 	}
 
-	void Packet::encrypt()
+	void Packet::_write(const uint8_t* pData, uint32_t nLength)
 	{
-		uint8_t* pData = const_cast<uint8_t*>(_getRawData());
-		//The checksum is important for the Packets UDP implementation. 
-		//If the package is damaged, it'll be noticable by verifying the checksum.
-		uint32_t nChecksum = 0; 
+		if (!isState(PS_WRITABLE))
+			return;
+
+		if (!m_pData)
+			m_pData = new uint8_t[nLength];
+		else
+			m_pData = (uint8_t*)realloc(m_pData, m_nSize + nLength);
+
+		memcpy(m_pData + m_nSize, pData, nLength);
+		m_nSize += nLength;
+	}
+
+	void Packet::writeString(const char* str)
+	{
+		if (!isState(PS_WRITABLE))
+			return;
+
+		uint32_t nLen = strlen(str);
 		
-		//This block under here is to obfuscate the packet content
-		//Without obfuscation it will be very easy to analyze the packets with external tools
-		//Warning: This obfuscation is fairly weak
-
-		//Obfuscate packet id
-		uint32_t nVal = 0;
-		memcpy(&nVal, pData, sizeof(uint32_t));
-		nVal ^= 0xAE;
-		memcpy(pData, &nVal, sizeof(uint32_t));
-
-		//Obfuscate packet content
-		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < _getRawSize(); ++i)
-		{
-			nChecksum += pData[i];
-			pData[i] ^= static_cast<uint8_t>(m_nPacketId); //Only need the lower end of the value
-		}
-
-		//Obfuscate generated checksum
-		for (uint32_t i = 0; i < sizeof(uint32_t); ++i)
-		{
-			uint8_t* pVal = reinterpret_cast<uint8_t*>(&nChecksum);
-			pVal[i] ^= static_cast<uint8_t>(m_nPacketId >> (2 + i));
-		}
-
-		// Overwrite checksum placeholder in packet data
-		memcpy(pData + sizeof(uint32_t), &nChecksum, sizeof(uint32_t));
+		writeUInt(nLen);
+		write(str, nLen);
 	}
 
-	bool Packet::decrypt()
+#ifndef _visNET_EXCLUDE_BLOBARRAY
+	void Packet::writeBlobArray(BlobArray& blob)
 	{
-		//Advice: Read the comments in the encrypt function
+		if (!isState(PS_WRITABLE))
+			return;
 
-		uint8_t* pData = const_cast<uint8_t*>(_getRawData());
-		uint32_t nChecksum = 0;
+		writeUInt(blob.getCount());
 
-		// Obfuscate packet id
-		uint32_t nVal = 0;
-		memcpy(&nVal, pData, sizeof(uint32_t)); //Get ID
-		nVal ^= 0xAE;
-		memcpy(pData, &nVal, sizeof(uint32_t));
+		if (blob.getCount() > 0)
+			write(blob.getIndexPtr(0), blob.getArraySize());
+	}
+#endif
 
-		// Obfuscate packet content
-		for (uint32_t i = (sizeof(uint32_t) /* Packet Id */ + sizeof(uint32_t) /* Checksum */); i < _getRawSize(); ++i)
-		{
-			pData[i] ^= static_cast<uint8_t>(nVal); //Only need the lower end of the value
-			nChecksum += pData[i]; // Make checksum based on unobfuscated data
-		}
-
-		// Obfuscate comparison checksum checksum
-		for (uint32_t i = 0; i < sizeof(uint32_t); ++i)
-		{
-			uint8_t* pVal = reinterpret_cast<uint8_t*>(&nChecksum);
-			pVal[i] ^= static_cast<uint8_t>(nVal >> (2 + i));
-		}
-
-		// Compare checksums
-		if (memcmp(&nChecksum, pData + sizeof(uint32_t), sizeof(uint32_t)) != 0)
+	bool Packet::_read(uint8_t* pBuffer, uint32_t nSize)
+	{
+		if (!isState(PS_READABLE))
 			return false;
+
+		if (!m_pData || m_nCursor + nSize > m_nSize) // Can't read without data or outside bounds
+		{
+			setState(PS_INVALID);
+			return false;
+		}
+
+		memcpy(pBuffer, m_pData + m_nCursor, nSize);
+
+		m_nCursor += nSize;
 
 		return true;
 	}
 
-	bool Packet::_onReceive(uint8_t* pData, uint32_t nLength)
+	bool Packet::readSkip(uint32_t nOffset)
 	{
-		if (RawPacket::_onReceive(pData, nLength))
+		if (!isState(PS_READABLE))
 			return false;
 
-		// If we can't decrypt the packet, it is invalid.
-		if (!decrypt())
+		if (!m_pData || m_nCursor + nOffset > m_nSize) // Can't read without data or outside of bounds
+		{
+			setState(PS_INVALID);
 			return false;
+		}
 
-		uint8_t* pPacketData = const_cast<uint8_t*>(_getRawData());
-		memcpy(&m_nPacketId, pPacketData, sizeof(uint32_t));
+		m_nCursor += nOffset;
 
 		return true;
 	}
 
-	void Packet::_onSend()
+	std::string Packet::readString()
 	{
-		RawPacket::_onSend();
+		uint32_t nLen = readUInt();
+		if (!isState(PS_READABLE))
+			return "";
 
-		encrypt();
+		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
+		if (!read(pBuffer, nLen))
+			return "";
+
+		pBuffer[nLen] = 0;
+
+		std::string result(reinterpret_cast<char*>(pBuffer));
+
+		delete[] pBuffer;
+
+		return result;
+	}
+
+#ifndef _visNET_EXCLUDE_BLOBARRAY
+	bool Packet::readBlobArray(BlobArray& blob)
+	{
+		if (!isState(PS_READABLE))
+			return false;
+
+		if (!m_pData || blob.getCount() != 0) // Can't read without data or in an already filled blob
+		{
+			setState(PS_INVALID);
+			return false;
+		}
+
+		uint32_t nBlobCount = readUInt();
+		if (!isState(PS_READABLE))
+			return false;
+
+		// Can't read more data than the packet buffer contains
+		if (m_nCursor + (nBlobCount * blob.getBlobSize()) > m_nSize)
+		{
+			setState(PS_INVALID);
+			return false;
+		}
+
+		if (nBlobCount > 0)
+			blob.add(m_pData + m_nCursor, nBlobCount);
+
+		m_nCursor += nBlobCount * blob.getBlobSize();
+
+		return true;
+	}
+#endif
+
+	int32_t Packet::_onReceive(uint8_t* pData, uint32_t nLength)
+	{
+		// Can't read into an already filled packet, except if its in receive state
+		if (!isState(PS_WRITABLE) && !isState(PS_INRECEIVE))
+			return -1;
+
+		if (isState(PS_WRITABLE))
+		{
+			delete[] m_pData;
+			m_pData = new uint8_t[nLength < sizeof(m_nSize) ? sizeof(m_nSize) : nLength];
+			m_nSize = 0;
+
+			setState(PS_INRECEIVE);
+		}
+
+		// If we haven't retrieved the packetsize yet
+		uint32_t nRead = 0;
+		if (m_nSize == 0)
+		{
+			// Only copy enough to get the full packet size
+			uint32_t nDiff = sizeof(m_nSize) - m_nCursor;
+			nRead = nLength > nDiff ? nDiff : nLength;
+
+			memcpy(m_pData + m_nCursor, pData, nRead);
+			m_nCursor += nRead;
+			nLength -= nRead;
+
+			if (m_nCursor < sizeof(m_nSize)) // Haven't received all size bytes yet
+				return 0;
+			else
+			{
+				memcpy(&m_nSize, m_pData, sizeof(m_nSize)); // Get real size
+				if (m_nSize > _visNET_PACKETSIZE_LIMIT || m_nSize < sizeof(m_nSize))
+					return -1;
+
+				m_pData = (uint8_t*)realloc(m_pData, m_nSize);
+			}
+		}
+
+		uint32_t nAdditionalData = 0;
+
+		// Only copy when we actually have data to write
+		if (nLength != 0)
+		{
+			// Do not read more than required, cut off!
+			if (nLength + m_nCursor <= m_nSize)
+			{
+				memcpy(m_pData + m_nCursor, pData + nRead, nLength);
+				m_nCursor += nLength;
+			}
+			else
+			{
+				nAdditionalData = (nLength + m_nCursor) - m_nSize;
+				memcpy(m_pData + m_nCursor, pData + nRead, m_nSize - m_nCursor);
+				m_nCursor = m_nSize;
+			}
+		}
+
+		if (m_nSize == m_nCursor)
+		{
+			m_nCursor = sizeof(m_nSize); // Set the cursor back for reading (0 + 4)
+			setState(PS_READABLE);
+		}
+
+		return nAdditionalData; // 0 if no additionals
 	}
 }

@@ -23,30 +23,7 @@ namespace visNET{
 		return true;
 	}
 
-	bool Socket::write(RawPacket& pPacket)
-	{
-		pPacket._onSend();
-		return _write(reinterpret_cast<const char*>(pPacket._getRawData()), pPacket._getRawSize());
-	}
-
-	bool Socket::read(RawPacket& packet)
-	{
-		// Cannot read data into an already filled packet
-		if (packet._getRawSize() != 0)
-			return false;
-
-		uint8_t buff[512]; // todo : Make buffer a configurable setting
-		int32_t nSize = _read(reinterpret_cast<char*>(&buff), sizeof(buff));
-		if (nSize <= 0)
-			return false;
-
-		if (!packet._onReceive(buff, nSize))
-			return false;
-			
-		return true;
-	}
-
-	bool Socket::_write(const char* pBuffer, int32_t nSize)
+	bool Socket::write(const uint8_t* pBuffer, int32_t nSize)
 	{
 		int32_t nRetn = send(m_handle, reinterpret_cast<const char*>(pBuffer), nSize, 0);
 		if (nRetn == SOCKET_ERROR)
@@ -55,9 +32,9 @@ namespace visNET{
 		return m_bAlive;
 	}
 
-	int32_t Socket::_read(char* pBuffer, int32_t nSize)
+	int32_t Socket::read(uint8_t* pBuffer, int32_t nSize)
 	{
-		int32_t nRetn = recv(m_handle, reinterpret_cast<char*>(pBuffer), nSize, 0);
+		int32_t nRetn = recv(m_handle, reinterpret_cast<char*>(pBuffer), nSize == 0 ? _visNET_NETWORKBUFFER_SIZE : nSize, 0);
 		if (nRetn == 0)
 			m_bAlive = false;
 		else if (nRetn > 0)

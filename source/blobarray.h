@@ -6,17 +6,27 @@
 	With a BlobArray you can efficiently send multiple objects of the same type.
 	It is also recommended to use if you want to send one single instance of an object.
 */
+
 namespace visNET{
 	class BlobArray{
 		uint32_t m_nBlobSize;
 		uint32_t m_nBlobCount;
 		uint8_t* m_pData;
+#ifndef _visNET_STRICT_REALLOC
+		uint32_t m_nBlobLimit;
+#endif
 
 	public:
 		BlobArray(uint32_t blobSize){
 			m_nBlobSize = blobSize;
 			m_nBlobCount = 0;
+
+#ifdef _visNET_STRICT_REALLOC
 			m_pData = new uint8_t[blobSize];
+#else
+			m_nBlobLimit = 10; // Initialize with 10 open slots
+			m_pData = new uint8_t[blobSize * m_nBlobLimit];
+#endif 
 		}
 
 		virtual ~BlobArray(){
@@ -26,8 +36,22 @@ namespace visNET{
 
 		template <typename T>
 		void add(T* pData, uint32_t nCount = 1){
+#ifdef _visNET_STRICT_REALLOC
 			if (m_nBlobCount != 0 || nCount > 1)
 				m_pData = (uint8_t*)realloc(m_pData, (m_nBlobCount + nCount) * m_nBlobSize);
+#else
+			uint32_t nDiff = 0;
+			if (m_nBlobCount + nCount > m_nBlobLimit)
+				nDiff = (m_nBlobCount + nCount) - m_nBlobLimit;
+
+			if (nDiff > 0)
+			{
+				m_nBlobLimit = m_nBlobCount + nDiff; // Make room for the additional blobs
+				m_nBlobLimit = (uint32_t)((m_nBlobLimit + 10) * _visNET_LOOSE_REALLOC); // Add 10 slots, and an additional percentage of the current slots
+
+				m_pData = (uint8_t*)realloc(m_pData, m_nBlobLimit * m_nBlobSize);
+			}
+#endif
 
 			memcpy(m_pData + (m_nBlobSize * m_nBlobCount), reinterpret_cast<uint8_t*>(pData), m_nBlobSize * nCount);
 			m_nBlobCount += nCount;
