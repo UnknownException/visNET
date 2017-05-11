@@ -151,7 +151,7 @@ namespace visNET{
 		if (isState(PS_WRITABLE))
 		{
 			delete[] m_pData;
-			m_pData = new uint8_t[nLength < sizeof(m_nSize) ? sizeof(m_nSize) : nLength];
+			m_pData = new uint8_t[sizeof(m_nSize)];
 			m_nSize = 0;
 
 			setState(PS_INRECEIVE);
@@ -207,5 +207,15 @@ namespace visNET{
 		}
 
 		return nAdditionalData; // 0 if no additionals
+	}
+
+	bool Packet::_onSend() 
+	{
+		if (!isWritable())
+			return false;
+
+		memcpy(m_pData, &m_nSize, sizeof(m_nSize)); // Overwrite first 4 bytes
+
+		return true;
 	}
 }

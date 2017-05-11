@@ -161,8 +161,6 @@ namespace visNET{
 		}
 	}
 
-
-	// Move these all at once!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	void TcpPool::acceptConnections()
 	{
 		m_mutNewSockets.lock();
@@ -236,6 +234,8 @@ namespace visNET{
 				pPacket = std::make_shared<Packet>();
 
 			nLeftOver = pPacket->_onReceive(m_pBuffer + (nRecv - nLeftOver), nRecv);
+			if (nLeftOver == -1)
+				pPacket = nullptr; // This should never happen
 
 			if (pPacket->isReadable())
 			{
@@ -245,6 +245,7 @@ namespace visNET{
 			else if (pPacket->isTransfering())
 			{
 				m_vecTransferPackets.push_back(std::make_pair(nId, pPacket));
+			//	assert(nLeftOver == 0); // Unknown behaviour if this is NOT 0
 			}
 		}
 
@@ -260,8 +261,9 @@ namespace visNET{
 			{
 				if (nId == (*it).first)
 				{
-					(*it).second->_onSend();
-					pSocket->write((*it).second->_getRawData(), (*it).second->_getRawSize());
+					if((*it).second->_onSend())
+						pSocket->write((*it).second->_getRawData(), (*it).second->_getRawSize());
+
 					it = m_vecSendPackets.erase(it);
 				}
 				else

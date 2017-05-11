@@ -131,19 +131,25 @@ namespace visNET{
 		// >0: Packet is finished, we have additional data (new packet)
 
 		int32_t _onReceive(uint8_t* pData, uint32_t nLength); 
-		void _onSend() {} //Gets called before being send
+		bool _onSend(); //Gets called before being send
 
 		void _swap(Packet* packet) {
 			//Save current ones
 			decltype(m_pData) pOldData = m_pData;
 			decltype(m_nSize) nOldSize = m_nSize;
+			decltype(m_eState) eOldState = m_eState;
+			decltype(m_nCursor) nOldCursor = m_nCursor;
 
 			//Transfer values
 			m_pData = packet->m_pData;
 			m_nSize = packet->m_nSize;
+			m_eState = packet->m_eState;
+			m_nCursor = packet->m_nCursor;
 
 			packet->m_pData = pOldData;
 			packet->m_nSize = nOldSize;
+			packet->m_eState = eOldState;
+			packet->m_nCursor = nOldCursor;
 		}
 	};
 }

@@ -11,7 +11,7 @@ namespace visNET{
 
 		uint32_t getConnection();
 
-		void send(uint32_t nClId, Packet& packet) { m_pTcpPool->sendPacket(nClId, std::make_shared<visNET::Packet>(packet)); }
+		void send(uint32_t nClId, std::shared_ptr<Packet> pPacket) { m_pTcpPool->sendPacket(nClId, pPacket); }
 		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets() { return m_pTcpPool->getPackets(); }
 	};
 }

@@ -16,7 +16,7 @@ namespace visNET{
 		TcpClient(const char* pszIp, uint16_t nPort);
 		virtual ~TcpClient();
 
-		void send(Packet& packet) { m_pTcpPool->sendPacket(m_nServerID, std::make_shared<visNET::Packet>(packet)); }
+		void send(std::shared_ptr<Packet> pPacket) { m_pTcpPool->sendPacket(m_nServerID, pPacket); }
 		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets() { return m_pTcpPool->getPackets(); }
 	};
 }
