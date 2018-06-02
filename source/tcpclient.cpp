@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "tcpclient.h"
 
-namespace visNET{
+namespace visNETCore{
 	TcpClient::TcpClient(const char* pszIp, uint16_t nPort)
 	{
 		m_pTcpPool = nullptr;
@@ -40,6 +40,7 @@ namespace visNET{
 			}
 
 			getSocket()->setHandle(s);
+			getSocket()->setNonBlocking(true);
 
 			break;
 		}

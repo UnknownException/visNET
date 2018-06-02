@@ -1,6 +1,6 @@
 #include "visnet.h"
 
-namespace visNET{
+namespace visNETCore{
 	bool startup()
 	{
 #ifdef _WIN32

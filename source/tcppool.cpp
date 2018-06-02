@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "tcppool.h"
 
-namespace visNET{
+namespace visNETCore{
 	TcpPool::TcpPool()
 	{
 		m_bPacketsAvailable = false;
@@ -41,10 +41,6 @@ namespace visNET{
 
 	decltype(TcpPool::m_nSocketID) TcpPool::addSocket(std::shared_ptr<Socket> s)
 	{
-		if (s->getHandle() == INVALID_SOCKET)
-			return 0;
-
-		s->setNonBlocking(true);
 		auto id = getFreeID();
 
 		m_mutNewSockets.lock();
@@ -58,7 +54,8 @@ namespace visNET{
 	{
 		m_mutDisconnectSockets.lock();
 
-		m_vecDisconnectSockets.push_back(nSocketID);
+		if (std::find(m_vecDisconnectSockets.begin(), m_vecDisconnectSockets.end(), nSocketID) == m_vecDisconnectSockets.end())
+			m_vecDisconnectSockets.push_back(nSocketID);
 
 		m_mutDisconnectSockets.unlock();
 	}
@@ -86,7 +83,7 @@ namespace visNET{
 		m_mutSendPackets.unlock();
 	}
 	
-	std::vector<decltype(TcpPool::m_nSocketID)> TcpPool::getDisconnected()
+	std::vector<decltype(TcpPool::m_nSocketID)> TcpPool::getDisconnected(bool bKeepHistory)
 	{
 		/* 
 			Create a list of disconnected ID's
@@ -95,9 +92,15 @@ namespace visNET{
 		m_mutDisconnected.lock();
 
 		auto retn(m_vecDisconnected);
-		m_vecDisconnected.clear();
+
+		if(!bKeepHistory)
+			m_vecDisconnected.clear();
 	
 		m_mutDisconnected.unlock();
+
+		// ID's are not free; Return
+		if (bKeepHistory)
+			return retn;
 
 		/*
 			Application will be notified with disconnected ID's
@@ -222,31 +225,25 @@ namespace visNET{
 		/*
 			Create new packet if required
 		*/
-
 		std::vector<std::pair<decltype(nId), decltype(pPacket)>> m_vecResult;
 
-		auto nRecv = pSocket->read(m_pBuffer);
+		auto nRecv = pSocket->read(m_pBuffer, _visNET_NETWORKBUFFER_SIZE);
 		auto nLeftOver = nRecv;
 
-		while (nLeftOver != 0)
+		while (nLeftOver > 0)
 		{
 			if (!pPacket)
 				pPacket = std::make_shared<Packet>();
 
-			nLeftOver = pPacket->_onReceive(m_pBuffer + (nRecv - nLeftOver), nRecv);
-			if (nLeftOver == -1)
-				pPacket = nullptr; // This should never happen
-
-			if (pPacket->isReadable())
-			{
+			nLeftOver = pPacket->_onReceive(m_pBuffer + (nRecv - nLeftOver), nLeftOver);
+			if (!pPacket->isValid())
+				removeSocket(nId);
+			else if (pPacket->isReadable())
 				m_vecResult.push_back(std::make_pair(nId, pPacket));
-				pPacket = nullptr;
-			}
 			else if (pPacket->isTransfering())
-			{
 				m_vecTransferPackets.push_back(std::make_pair(nId, pPacket));
-			//	assert(nLeftOver == 0); // Unknown behaviour if this is NOT 0
-			}
+
+			pPacket = nullptr;
 		}
 
 		return m_vecResult;

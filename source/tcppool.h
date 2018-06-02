@@ -5,7 +5,7 @@
 	Converts reveived chunks back into complete packets
 */
 
-namespace visNET{
+namespace visNETCore{
 	class TcpPool{
 		uint32_t m_nSocketID;
 		std::mutex m_mutReserveID;
@@ -43,7 +43,7 @@ namespace visNET{
 
 		auto getPackets() -> decltype(m_vecRecvPackets);
 		void sendPacket(decltype(m_nSocketID) nSocketID, std::shared_ptr<Packet> pPacket);
-		std::vector<decltype(m_nSocketID)> getDisconnected();
+		std::vector<decltype(m_nSocketID)> getDisconnected(bool bKeepHistory);
 	private:
 		void run();
 		void acceptConnections();

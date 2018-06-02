@@ -7,6 +7,13 @@
 	It is also recommended to use if you want to send one single instance of an object.
 */
 
+// Changes memory allocation to strict (Less usage, more reallocations)
+//#define _visNET_STRICT_REALLOC
+
+#ifndef _visNET_STRICT_REALLOC
+#define _visNET_LOOSE_REALLOC 1.1f // Allocate 10% above required
+#endif
+
 namespace visNET{
 	class BlobArray{
 		uint32_t m_nBlobSize;
@@ -89,3 +96,11 @@ namespace visNET{
 		uint32_t getCount() { return m_nBlobCount; }
 	};
 }
+
+#ifdef _visNET_STRICT_REALLOC
+	#undef _visNET_STRICT_REALLOC
+#endif
+
+#ifdef _visNET_LOOSE_REALLOC
+	#undef _visNET_LOOSE_REALLOC
+#endif

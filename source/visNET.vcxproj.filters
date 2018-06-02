@@ -18,7 +18,6 @@
     <ClInclude Include="socket.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="visnet.h" />
     <ClInclude Include="blobarray.h">
       <Filter>Structure</Filter>
     </ClInclude>
@@ -40,12 +39,12 @@
     <ClInclude Include="udpclient.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="visnet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="visnet.cpp" />
     <ClCompile Include="packet.cpp">
       <Filter>Packet</Filter>
     </ClCompile>
@@ -61,5 +60,6 @@
     <ClCompile Include="tcppool.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
+    <ClCompile Include="visnet.cpp" />
   </ItemGroup>
 </Project>

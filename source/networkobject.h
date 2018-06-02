@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNET{
+namespace visNETCore{
 	class NetworkObject{
 		Socket m_socket;
 		bool m_bValid;
@@ -13,9 +13,8 @@ namespace visNET{
 	protected:
 		void setValid() { m_bValid = true; }
 
-	public:
-		Socket* getSocket() { return &m_socket; }
 	protected:
+		Socket* getSocket() { return &m_socket; }
 		void setSocket(Socket& s) { m_socket = s; }
 
 	public:
@@ -23,7 +22,7 @@ namespace visNET{
 	protected:
 		void setError(const char* pszError) { m_strError = pszError; }
 
-	public:
+	protected:
 		bool setNonBlocking(bool b) { return getSocket()->setNonBlocking(b); }
 	};
 }

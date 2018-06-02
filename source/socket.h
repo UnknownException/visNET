@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNET{
+namespace visNETCore{
 	class Socket{
 		SOCKET m_handle;
 		bool m_bAlive;
@@ -16,9 +16,10 @@ namespace visNET{
 		void setAlive(bool b) { m_bAlive = b; }
 		bool getAlive() { return m_bAlive; }
 
-		bool write(const uint8_t* buffer, int32_t size);
-		int32_t read(uint8_t* buffer, int32_t size = 0);
-	private:
+		bool write(const uint8_t* pBuffer, int32_t nSize);
+		int32_t read(uint8_t* pBuffer, int32_t nSize);
 
+		bool writeTo(const uint8_t* pBuffer, int32_t nSize, const char* szIP, const uint16_t nPort);
+		std::pair<sockaddr_in, int32_t> readFrom(uint8_t* pBuffer, int32_t nSize);
 	};
 }

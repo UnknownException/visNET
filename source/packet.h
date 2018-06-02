@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNET{
+namespace visNETCore{
 	class Packet{
 		uint32_t m_nSize;
 		uint8_t* m_pData;
@@ -35,14 +35,12 @@ namespace visNET{
 		void writeUShort(uint16_t n) { write(&n, sizeof(uint16_t)); }
 		void writeChar(int8_t n) { write(&n, sizeof(int8_t)); }
 		void writeUChar(uint8_t n) { write(&n, sizeof(uint8_t)); }
-		void writeFloat(float_t f) { write(&f, sizeof(float_t)); }
-		void writeDouble(double_t d) { write(&d, sizeof(double_t)); }
+		void writeFloat(float f) { write(&f, sizeof(float)); }
+		void writeDouble(double d) { write(&d, sizeof(double)); }
 		void writeBool(bool b) { write(&b, sizeof(bool)); }
 
 		void writeString(const char* str);
-#ifndef _visNET_EXCLUDE_BLOBARRAY
-		void writeBlobArray(BlobArray& blob); // Efficient way to send multiple objects
-#endif
+		void writeBlobArray(visNET::BlobArray& blob); // Efficient way to send multiple objects
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
 	private:
@@ -91,15 +89,15 @@ namespace visNET{
 			return n;
 		}
 
-		float_t readFloat() {
-			float_t f = 0.f;
-			read(&f, sizeof(float_t));
+		float readFloat() {
+			float f = 0.f;
+			read(&f, sizeof(float));
 			return f;
 		}
 
-		double_t readDouble() {
-			double_t d = 0.f;
-			read(&d, sizeof(double_t));	
+		double readDouble() {
+			double d = 0.f;
+			read(&d, sizeof(double));	
 			return d;
 		}
 
@@ -110,10 +108,7 @@ namespace visNET{
 		}
 
 		std::string readString();
-
-#ifndef _visNET_EXCLUDE_BLOBARRAY
-		bool readBlobArray(BlobArray& blob);
-#endif
+		bool readBlobArray(visNET::BlobArray& blob);
 
 		bool isReadable() { return isState(PS_READABLE); } // When the state is not readable, it hasn't read correctly
 		bool isValid() { return !isState(PS_INVALID); }

@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "tcplistener.h"
 
-namespace visNET{
+namespace visNETCore{
 	TcpListener::TcpListener(uint16_t nPort)
 	{
 		m_pTcpPool = nullptr;
@@ -50,6 +50,7 @@ namespace visNET{
 		}
 
 		getSocket()->setHandle(s);
+		getSocket()->setNonBlocking(true);
 
 		setValid();
 
@@ -67,7 +68,9 @@ namespace visNET{
 		std::shared_ptr<Socket> s = std::make_shared<Socket>();
 		s->setHandle(accept(getSocket()->getHandle(), nullptr, nullptr));
 		if (s->getHandle() == INVALID_SOCKET)
-			s->setAlive(false);
+			return 0;
+
+		s->setNonBlocking(true);
 
 		return m_pTcpPool->addSocket(s);
 	}

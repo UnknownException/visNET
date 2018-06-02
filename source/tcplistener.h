@@ -1,7 +1,7 @@
 #pragma once
 #include "networkobject.h"
 
-namespace visNET{
+namespace visNETCore{
 	class TcpListener : public NetworkObject{
 		TcpPool* m_pTcpPool;
 
@@ -13,5 +13,7 @@ namespace visNET{
 
 		void send(uint32_t nClId, std::shared_ptr<Packet> pPacket) { m_pTcpPool->sendPacket(nClId, pPacket); }
 		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets() { return m_pTcpPool->getPackets(); }
+		std::vector<uint32_t> getDisconnected() { return m_pTcpPool->getDisconnected(false); }
+		void disconnect(uint32_t nClId) { m_pTcpPool->removeSocket(nClId); }
 	};
 }

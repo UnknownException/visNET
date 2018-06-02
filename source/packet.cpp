@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "packet.h"
 
-namespace visNET{
+namespace visNETCore{
 	Packet::Packet()
 	{
 		m_nSize = 0;
@@ -44,8 +44,7 @@ namespace visNET{
 		write(str, nLen);
 	}
 
-#ifndef _visNET_EXCLUDE_BLOBARRAY
-	void Packet::writeBlobArray(BlobArray& blob)
+	void Packet::writeBlobArray(visNET::BlobArray& blob)
 	{
 		if (!isState(PS_WRITABLE))
 			return;
@@ -55,7 +54,6 @@ namespace visNET{
 		if (blob.getCount() > 0)
 			write(blob.getIndexPtr(0), blob.getArraySize());
 	}
-#endif
 
 	bool Packet::_read(uint8_t* pBuffer, uint32_t nSize)
 	{
@@ -110,8 +108,7 @@ namespace visNET{
 		return result;
 	}
 
-#ifndef _visNET_EXCLUDE_BLOBARRAY
-	bool Packet::readBlobArray(BlobArray& blob)
+	bool Packet::readBlobArray(visNET::BlobArray& blob)
 	{
 		if (!isState(PS_READABLE))
 			return false;
@@ -140,7 +137,6 @@ namespace visNET{
 
 		return true;
 	}
-#endif
 
 	int32_t Packet::_onReceive(uint8_t* pData, uint32_t nLength)
 	{
@@ -175,7 +171,10 @@ namespace visNET{
 			{
 				memcpy(&m_nSize, m_pData, sizeof(m_nSize)); // Get real size
 				if (m_nSize > _visNET_PACKETSIZE_LIMIT || m_nSize < sizeof(m_nSize))
+				{
+					setState(PS_INVALID);
 					return -1;
+				}
 
 				m_pData = (uint8_t*)realloc(m_pData, m_nSize);
 			}

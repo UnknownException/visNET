@@ -1,23 +1,13 @@
 #pragma once
 #include "networkobject.h"
 
-namespace visNET{
+namespace visNETCore{
 	class UdpClient : public NetworkObject{
 	public:
 		UdpClient(uint16_t nPort);
 		virtual ~UdpClient();
 
-		/*
-
-		// Add ip and udp functions
-
-		template <typename T>
-		bool write(const T* buffer, int32_t size) { return getSocket()->write(buffer, size); }
-		bool write(Packet& packet) { return getSocket()->write(packet); }
-
-		template <typename T>
-		int32_t read(T* buffer, int32_t size) { return getSocket()->read(buffer, size); }
-		bool read(Packet& packet) { return getSocket()->read(packet); }
-		*/
+		bool send(std::shared_ptr<Packet> pPacket, const char* szIP, unsigned short nPort) { pPacket->_onSend(); return getSocket()->writeTo(pPacket->_getRawData(), pPacket->_getRawSize(), szIP, nPort); }
+		std::vector<std::tuple<std::string, uint16_t, std::shared_ptr<Packet>>> getPackets();
 	};
 }
