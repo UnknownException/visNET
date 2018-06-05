@@ -22,7 +22,11 @@
 #define _visNET_NETWORKBUFFER_SIZE 0x0FFF
 
 #include "blobarray.h"
+
+#include "connectionidentifier.h"
 #include "packet.h"
+#include "tcpmessage.h"
+#include "udpmessage.h"
 #include "socket.h"
 #include "tcppool.h"
 #include "tcplistener.h"

@@ -41,11 +41,24 @@ namespace visNETCore{
 	{
 	}
 
-	std::vector<std::tuple<std::string, uint16_t, std::shared_ptr<Packet>>> UdpClient::getPackets()
+	bool UdpClient::send(UdpMessage& message) 
 	{
-		std::vector<std::tuple<std::string, uint16_t, std::shared_ptr<Packet>>> retn;
+		if (!isValid())
+			return false;
+
+		message.getPacket()->_onSend(); 
+		return getSocket()->writeTo(message.getPacket()->_getRawData(), message.getPacket()->_getRawSize(), message.getIP().c_str(), message.getPort());
+	}
+
+	std::vector<UdpMessage> UdpClient::getPackets()
+	{
+		if (!isValid())
+			return std::vector<UdpMessage>();
+
+		std::vector<UdpMessage> retn;
 
 		uint8_t* buffer = new uint8_t[_visNET_NETWORKBUFFER_SIZE];
+
 		auto result = getSocket()->readFrom(buffer, _visNET_NETWORKBUFFER_SIZE);
 		while (result.second > 0)
 		{
@@ -61,16 +74,15 @@ namespace visNETCore{
 					char tmp[INET_ADDRSTRLEN];
 					InetNtop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
 
-					retn.push_back(std::make_tuple(std::string(tmp), result.first.sin_port, packet));
+					retn.push_back(UdpMessage(std::string(tmp), result.first.sin_port, packet));
 				}
-				else
-				{
-					printf("Failed, packetsize not equal\n");
-				}
+				// else the packet will be dropped
 			}
 
 			result = getSocket()->readFrom(buffer, _visNET_NETWORKBUFFER_SIZE);
 		}
+
+		delete[] buffer;
 
 		return retn;
 	}

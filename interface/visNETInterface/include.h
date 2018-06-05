@@ -6,8 +6,6 @@
 #include <vector>
 #include "../../source/blobarray.h"
 
-//template class __declspec(dllexport) std::shared_ptr<void>;
-
 namespace visNET {
 	/* Base Interface */
 	__declspec(dllexport) bool startup();

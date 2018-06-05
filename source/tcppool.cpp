@@ -7,7 +7,7 @@ namespace visNETCore{
 		m_bPacketsAvailable = false;
 		m_bRun = true;
 
-		m_nSocketID = 0;
+		m_currentIdentifier.increase(); // Start at 1
 
 		m_pBuffer = new uint8_t[_visNET_NETWORKBUFFER_SIZE];
 
@@ -22,26 +22,31 @@ namespace visNETCore{
 		delete[] m_pBuffer;
 	}
 
-	decltype(TcpPool::m_nSocketID) TcpPool::getFreeID()
+	ConnectionIdentifier TcpPool::generateIdentifier()
 	{
-		decltype(m_nSocketID) id = 0;
+		ConnectionIdentifier freeIdentifier;
 
 		m_mutReserveID.lock();
-		if (m_queReserveID.empty())
-			id = ++m_nSocketID;
-		else
-		{
-			id = m_queReserveID.front();
-			m_queReserveID.pop();
-		}
+
+			if (m_queReserveID.empty())
+			{
+				freeIdentifier = m_currentIdentifier;
+				m_currentIdentifier.increase();
+			}
+			else
+			{
+				freeIdentifier = m_queReserveID.front();
+				m_queReserveID.pop();
+			}
+
 		m_mutReserveID.unlock();
 
-		return id;
+		return freeIdentifier;
 	}
 
-	decltype(TcpPool::m_nSocketID) TcpPool::addSocket(std::shared_ptr<Socket> s)
+	ConnectionIdentifier TcpPool::addSocket(std::shared_ptr<Socket> s)
 	{
-		auto id = getFreeID();
+		auto id = generateIdentifier();
 
 		m_mutNewSockets.lock();
 		m_vecNewSockets.push_back(std::make_pair(id, s));
@@ -50,19 +55,19 @@ namespace visNETCore{
 		return id;
 	}
 
-	void TcpPool::removeSocket(decltype(m_nSocketID) nSocketID)
+	void TcpPool::removeSocket(ConnectionIdentifier connectionId)
 	{
 		m_mutDisconnectSockets.lock();
 
-		if (std::find(m_vecDisconnectSockets.begin(), m_vecDisconnectSockets.end(), nSocketID) == m_vecDisconnectSockets.end())
-			m_vecDisconnectSockets.push_back(nSocketID);
+		if (std::find(m_vecDisconnectSockets.begin(), m_vecDisconnectSockets.end(), connectionId) == m_vecDisconnectSockets.end())
+			m_vecDisconnectSockets.push_back(connectionId);
 
 		m_mutDisconnectSockets.unlock();
 	}
 
-	decltype(TcpPool::m_vecRecvPackets) TcpPool::getPackets()
+	std::vector<TcpMessage> TcpPool::getPackets()
 	{
-		decltype(m_vecRecvPackets) packets;
+		std::vector<TcpMessage> packets;
 
 		if (!m_bPacketsAvailable)
 			return packets;
@@ -76,14 +81,14 @@ namespace visNETCore{
 		return packets;
 	}
 
-	void TcpPool::sendPacket(decltype(m_nSocketID) nSocketID, std::shared_ptr<Packet> pPacket)
+	void TcpPool::sendPacket(TcpMessage& message)
 	{
 		m_mutSendPackets.lock();
-		m_vecSendPackets.push_back(std::make_pair(nSocketID, pPacket));
+		m_vecSendPackets.push_back(message);
 		m_mutSendPackets.unlock();
 	}
 	
-	std::vector<decltype(TcpPool::m_nSocketID)> TcpPool::getDisconnected(bool bKeepHistory)
+	std::vector<ConnectionIdentifier> TcpPool::getDisconnected(bool bKeepHistory)
 	{
 		/* 
 			Create a list of disconnected ID's
@@ -174,7 +179,7 @@ namespace visNETCore{
 		m_mutNewSockets.unlock();
 	}
 
-	bool TcpPool::cleanupConnection(decltype(m_nSocketID) nId, std::shared_ptr<Socket> pSocket)
+	bool TcpPool::cleanupConnection(ConnectionIdentifier nId, std::shared_ptr<Socket> pSocket)
 	{
 		bool bAlive = pSocket->getAlive();
 
@@ -184,7 +189,7 @@ namespace visNETCore{
 		{
 			for (auto it = m_vecDisconnectSockets.begin(); it != m_vecDisconnectSockets.end(); ++it)
 			{
-				if (*it == m_nSocketID)
+				if (*it == m_currentIdentifier) // CHECK LOGIC BEHIND THIS!!!!
 				{
 					it = m_vecDisconnectSockets.erase(it);
 					bAlive = false;
@@ -205,7 +210,7 @@ namespace visNETCore{
 		return !bAlive;
 	}
 
-	std::vector<std::pair<decltype(TcpPool::m_nSocketID), std::shared_ptr<Packet >> > TcpPool::recvPackets(decltype(m_nSocketID) nId, std::shared_ptr<Socket> pSocket)
+	std::vector<TcpMessage> TcpPool::recvPackets(ConnectionIdentifier nId, std::shared_ptr<Socket> pSocket)
 	{
 		std::shared_ptr<Packet> pPacket = nullptr;
 
@@ -214,9 +219,9 @@ namespace visNETCore{
 		*/
 		for (auto it = m_vecTransferPackets.begin(); it != m_vecTransferPackets.end(); ++it)
 		{
-			if (nId == (*it).first)
+			if (nId == (*it).getConnectionIdentifier())
 			{
-				pPacket = (*it).second;
+				pPacket = (*it).getPacket();
 				m_vecTransferPackets.erase(it);
 				break;
 			}
@@ -225,7 +230,7 @@ namespace visNETCore{
 		/*
 			Create new packet if required
 		*/
-		std::vector<std::pair<decltype(nId), decltype(pPacket)>> m_vecResult;
+		std::vector<TcpMessage> m_vecResult;
 
 		auto nRecv = pSocket->read(m_pBuffer, _visNET_NETWORKBUFFER_SIZE);
 		auto nLeftOver = nRecv;
@@ -239,9 +244,9 @@ namespace visNETCore{
 			if (!pPacket->isValid())
 				removeSocket(nId);
 			else if (pPacket->isReadable())
-				m_vecResult.push_back(std::make_pair(nId, pPacket));
+				m_vecResult.push_back(TcpMessage(nId, pPacket));
 			else if (pPacket->isTransfering())
-				m_vecTransferPackets.push_back(std::make_pair(nId, pPacket));
+				m_vecTransferPackets.push_back(TcpMessage(nId, pPacket));
 
 			pPacket = nullptr;
 		}
@@ -249,17 +254,17 @@ namespace visNETCore{
 		return m_vecResult;
 	}
 
-	void TcpPool::sendPackets(decltype(m_nSocketID) nId, std::shared_ptr<Socket> pSocket)
+	void TcpPool::sendPackets(ConnectionIdentifier nId, std::shared_ptr<Socket> pSocket)
 	{
 		m_mutSendPackets.lock();
 		if (!m_vecSendPackets.empty())
 		{
 			for (auto it = m_vecSendPackets.begin(); it != m_vecSendPackets.end();)
 			{
-				if (nId == (*it).first)
+				if (nId == (*it).getConnectionIdentifier())
 				{
-					if((*it).second->_onSend())
-						pSocket->write((*it).second->_getRawData(), (*it).second->_getRawSize());
+					if((*it).getPacket()->_onSend())
+						pSocket->write((*it).getPacket()->_getRawData(), (*it).getPacket()->_getRawSize());
 
 					it = m_vecSendPackets.erase(it);
 				}

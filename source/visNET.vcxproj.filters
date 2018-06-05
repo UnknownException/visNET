@@ -40,6 +40,15 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="visnet.h" />
+    <ClInclude Include="udpmessage.h">
+      <Filter>Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="tcpmessage.h">
+      <Filter>Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="connectionidentifier.h">
+      <Filter>Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">

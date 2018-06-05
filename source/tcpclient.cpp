@@ -5,7 +5,6 @@ namespace visNETCore{
 	TcpClient::TcpClient(const char* pszIp, uint16_t nPort)
 	{
 		m_pTcpPool = nullptr;
-		m_nServerID = 0;
 
 		addrinfo hints, *result;
 		ZeroMemory(&hints, sizeof(addrinfo));
@@ -54,7 +53,7 @@ namespace visNETCore{
 		}
 
 		m_pTcpPool = new TcpPool;
-		m_nServerID = m_pTcpPool->addSocket(std::make_shared<Socket>(*getSocket()));
+		m_serverIdentifier = m_pTcpPool->addSocket(std::make_shared<Socket>(*getSocket()));
 
 		setValid();
 	}
@@ -63,5 +62,29 @@ namespace visNETCore{
 	{
 		if (m_pTcpPool)
 			delete m_pTcpPool;
+	}
+
+	void TcpClient::send(std::shared_ptr<Packet> pPacket) 
+	{ 
+		if (!isValid())
+			return; 
+		
+		m_pTcpPool->sendPacket(TcpMessage(m_serverIdentifier, pPacket));
+	}
+
+	std::vector<TcpMessage> TcpClient::getPackets()
+	{
+		if (!isValid())
+			return std::vector<TcpMessage>();
+
+		return m_pTcpPool->getPackets();
+	}
+
+	bool TcpClient::isDisconnected() 
+	{ 
+		if (!isValid())
+			return true;
+
+		return !m_pTcpPool->getDisconnected(true).empty();
 	}
 }

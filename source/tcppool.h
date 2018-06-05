@@ -7,25 +7,25 @@
 
 namespace visNETCore{
 	class TcpPool{
-		uint32_t m_nSocketID;
+		ConnectionIdentifier m_currentIdentifier;
 		std::mutex m_mutReserveID;
-		std::queue<decltype(m_nSocketID)> m_queReserveID;
+		std::queue<ConnectionIdentifier> m_queReserveID;
 
 		std::mutex m_mutSendPackets;
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Packet>>> m_vecSendPackets;
+		std::vector<TcpMessage> m_vecSendPackets;
 
 		std::atomic<bool> m_bPacketsAvailable;
 		std::mutex m_mutRecvPackets;
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Packet>>> m_vecRecvPackets;
+		std::vector<TcpMessage> m_vecRecvPackets;
 
 		std::mutex m_mutNewSockets;
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Socket>>> m_vecNewSockets;
+		std::vector<std::pair<ConnectionIdentifier, std::shared_ptr<Socket>>> m_vecNewSockets;
 		std::mutex m_mutDisconnectSockets;
-		std::vector<decltype(m_nSocketID)> m_vecDisconnectSockets;
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Socket>>> m_vecSockets;
+		std::vector<ConnectionIdentifier> m_vecDisconnectSockets;
+		std::vector<std::pair<ConnectionIdentifier, std::shared_ptr<Socket>>> m_vecSockets;
 
 		std::mutex m_mutDisconnected;
-		std::vector<decltype(m_nSocketID)> m_vecDisconnected;
+		std::vector<ConnectionIdentifier> m_vecDisconnected;
 
 		std::atomic<bool> m_bRun;
 		std::unique_ptr<std::thread> m_pThread;
@@ -36,21 +36,21 @@ namespace visNETCore{
 		virtual ~TcpPool();
 
 	private:
-		auto getFreeID() -> decltype(m_nSocketID);
+		ConnectionIdentifier generateIdentifier();
 	public:
-		auto addSocket(std::shared_ptr<Socket> s) -> decltype(m_nSocketID);
-		void removeSocket(decltype(m_nSocketID));
+		ConnectionIdentifier addSocket(std::shared_ptr<Socket> s);
+		void removeSocket(ConnectionIdentifier id);
+		std::vector<ConnectionIdentifier> getDisconnected(bool bKeepHistory);
 
-		auto getPackets() -> decltype(m_vecRecvPackets);
-		void sendPacket(decltype(m_nSocketID) nSocketID, std::shared_ptr<Packet> pPacket);
-		std::vector<decltype(m_nSocketID)> getDisconnected(bool bKeepHistory);
+		std::vector<TcpMessage> getPackets();
+		void sendPacket(TcpMessage& message);
 	private:
 		void run();
 		void acceptConnections();
-		bool cleanupConnection(decltype(m_nSocketID), std::shared_ptr<Socket> pSocket);
+		bool cleanupConnection(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
 
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Packet>>> m_vecTransferPackets;
-		std::vector<std::pair<decltype(m_nSocketID), std::shared_ptr<Packet>>> recvPackets(decltype(m_nSocketID), std::shared_ptr<Socket> pSocket);
-		void sendPackets(decltype(m_nSocketID), std::shared_ptr<Socket> pSocket);
+		std::vector<TcpMessage> m_vecTransferPackets;
+		std::vector<TcpMessage> recvPackets(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
+		void sendPackets(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
 	};
 }

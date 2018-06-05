@@ -63,18 +63,50 @@ namespace visNETCore{
 			delete m_pTcpPool;
 	}
 
-	uint32_t TcpListener::getConnection()
+	ConnectionIdentifier TcpListener::getConnection()
 	{
 		if (!isValid())
-			return 0;
+			return ConnectionIdentifier();
 
 		std::shared_ptr<Socket> s = std::make_shared<Socket>();
 		s->setHandle(accept(getSocket()->getHandle(), nullptr, nullptr));
 		if (s->getHandle() == INVALID_SOCKET)
-			return 0;
+			return ConnectionIdentifier();
 
 		s->setNonBlocking(true);
 
 		return m_pTcpPool->addSocket(s);
+	}
+
+	void TcpListener::send(TcpMessage& message) 
+	{ 
+		if (!isValid())
+			return;
+
+		m_pTcpPool->sendPacket(message); 
+	}
+	
+	std::vector<TcpMessage> TcpListener::getPackets() 
+	{ 
+		if(!isValid())
+			return std::vector<TcpMessage>();
+
+		return m_pTcpPool->getPackets();
+	}
+	
+	std::vector<ConnectionIdentifier> TcpListener::getDisconnected()
+	{ 
+		if (!isValid())
+			return  std::vector<ConnectionIdentifier>();
+
+		return m_pTcpPool->getDisconnected(false);
+	}
+	
+	void TcpListener::disconnect(ConnectionIdentifier clientId) 
+	{ 
+		if (!isValid())
+			return;
+
+		m_pTcpPool->removeSocket(clientId);
 	}
 }

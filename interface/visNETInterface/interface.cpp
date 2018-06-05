@@ -195,12 +195,12 @@ namespace visNET {
 
 	uint32_t TcpListener::getConnection()
 	{
-		return ((visNETCore::TcpListener*)tcpListener)->getConnection();
+		return ((visNETCore::TcpListener*)tcpListener)->getConnection().getValue();
 	}
 
 	void TcpListener::send(uint32_t nClId, Packet& packet)
 	{
-		((visNETCore::TcpListener*)tcpListener)->send(nClId, PacketInstance::getInstance(&packet));
+		((visNETCore::TcpListener*)tcpListener)->send(visNETCore::TcpMessage(visNETCore::ConnectionIdentifier(nClId), PacketInstance::getInstance(&packet)));
 	}
 
 	std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> TcpListener::getPackets()
@@ -209,14 +209,20 @@ namespace visNET {
 
 		auto packets = ((visNETCore::TcpListener*)tcpListener)->getPackets();
 		for (auto it = packets.begin(); it != packets.end(); ++it)
-			retn.push_back(std::make_pair((*it).first, std::make_shared<Packet>((*it).second)));
+			retn.push_back(std::make_pair((*it).getConnectionIdentifier().getValue(), std::make_shared<Packet>((*it).getPacket())));
 
 		return retn;
 	}
 
 	std::vector<uint32_t> TcpListener::getDisconnected()
 	{
-		return ((visNETCore::TcpListener*)tcpListener)->getDisconnected();
+		std::vector<uint32_t> retn;
+
+		auto disconnected = ((visNETCore::TcpListener*)tcpListener)->getDisconnected();
+		for (auto it = disconnected.begin(); it != disconnected.end(); ++it)
+			retn.push_back((*it).getValue());
+
+		return retn;
 	}
 
 	void TcpListener::disconnect(uint32_t nClId)
@@ -260,7 +266,7 @@ namespace visNET {
 
 		auto packets = ((visNETCore::TcpClient*)tcpClient)->getPackets();
 		for (auto it = packets.begin(); it != packets.end(); ++it)
-			retn.push_back(std::make_pair((*it).first, std::make_shared<Packet>((*it).second)));
+			retn.push_back(std::make_pair((*it).getConnectionIdentifier().getValue(), std::make_shared<Packet>((*it).getPacket())));
 
 		return retn;
 	}
@@ -296,7 +302,7 @@ namespace visNET {
 
 	bool UdpClient::send(Packet& packet, const char* szIP, unsigned short nPort)
 	{
-		return ((visNETCore::UdpClient*)udpClient)->send(PacketInstance::getInstance(&packet), szIP, nPort);
+		return ((visNETCore::UdpClient*)udpClient)->send(visNETCore::UdpMessage(szIP, nPort, PacketInstance::getInstance(&packet)));
 	}
 
 	std::vector<std::tuple<std::string, uint16_t, std::shared_ptr<Packet>>> UdpClient::getPackets()
@@ -305,7 +311,7 @@ namespace visNET {
 
 		auto packets = ((visNETCore::UdpClient*)udpClient)->getPackets();
 		for (auto it = packets.begin(); it != packets.end(); ++it)
-			retn.push_back(std::make_tuple(std::get<0>((*it)), std::get<1>((*it)), std::make_shared<Packet>(std::get<2>((*it)))));
+			retn.push_back(std::make_tuple((*it).getIP(), (*it).getPort(), std::make_shared<Packet>((*it).getPacket())));
 
 		return retn;
 	}

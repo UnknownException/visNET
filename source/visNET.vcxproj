@@ -126,13 +126,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="blobarray.h" />
+    <ClInclude Include="connectionidentifier.h" />
     <ClInclude Include="tcpclient.h" />
     <ClInclude Include="networkobject.h" />
+    <ClInclude Include="tcpmessage.h" />
     <ClInclude Include="tcppool.h" />
     <ClInclude Include="tcplistener.h" />
     <ClInclude Include="packet.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="udpclient.h" />
+    <ClInclude Include="udpmessage.h" />
     <ClInclude Include="visnet.h" />
   </ItemGroup>
   <ItemGroup>
