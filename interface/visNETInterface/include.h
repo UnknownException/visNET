@@ -40,6 +40,7 @@ namespace visNET {
 		void writeDouble(double d);
 		void writeBool(bool b);
 		void writeString(const char* str);
+		void writeString(std::string str) { writeString(str.c_str()); }
 		void writeBlobArray(BlobArray& blob);
 
 		bool readSkip(uint32_t offset);

@@ -52,9 +52,9 @@ namespace visNETCore{
 		getSocket()->setHandle(s);
 		getSocket()->setNonBlocking(true);
 
-		setValid();
-
 		m_pTcpPool = new TcpPool;
+
+		setValid();
 	}
 
 	TcpListener::~TcpListener()
@@ -65,6 +65,9 @@ namespace visNETCore{
 
 	uint32_t TcpListener::getConnection()
 	{
+		if (!isValid())
+			return 0;
+
 		std::shared_ptr<Socket> s = std::make_shared<Socket>();
 		s->setHandle(accept(getSocket()->getHandle(), nullptr, nullptr));
 		if (s->getHandle() == INVALID_SOCKET)

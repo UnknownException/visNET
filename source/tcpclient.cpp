@@ -53,10 +53,10 @@ namespace visNETCore{
 			return;
 		}
 
-		setValid();
-
 		m_pTcpPool = new TcpPool;
 		m_nServerID = m_pTcpPool->addSocket(std::make_shared<Socket>(*getSocket()));
+
+		setValid();
 	}
 
 	TcpClient::~TcpClient()

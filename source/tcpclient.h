@@ -16,8 +16,8 @@ namespace visNETCore{
 		TcpClient(const char* pszIp, uint16_t nPort);
 		virtual ~TcpClient();
 
-		void send(std::shared_ptr<Packet> pPacket) { m_pTcpPool->sendPacket(m_nServerID, pPacket); }
-		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets() { return m_pTcpPool->getPackets(); }
-		bool isDisconnected() { return !m_pTcpPool->getDisconnected(true).empty(); }
+		void send(std::shared_ptr<Packet> pPacket) { if (isValid()) { m_pTcpPool->sendPacket(m_nServerID, pPacket); } }
+		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets() { return isValid() ? m_pTcpPool->getPackets() : std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>>(); }
+		bool isDisconnected() { return isValid() ? !m_pTcpPool->getDisconnected(true).empty() : true; }
 	};
 }
