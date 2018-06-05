@@ -1,4 +1,3 @@
-#include <Windows.h>
 #include "base.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -34,7 +33,7 @@ namespace UnitTest
 			Assert::IsTrue(packet.isValid());
 		}
 
-		TEST_METHOD(ReadPacket)
+		TEST_METHOD(SendAndReadPacketThroughTcpConnection)
 		{
 			/* Create TCP listener and client */
 			Assert::IsTrue(visNET::startup(), L"Failed to startup", LINE_INFO());

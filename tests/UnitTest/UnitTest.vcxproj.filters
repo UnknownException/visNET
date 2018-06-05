@@ -3,6 +3,8 @@
   <ItemGroup>
     <ClCompile Include="TestBlobArray.cpp" />
     <ClCompile Include="TestPacket.cpp" />
+    <ClCompile Include="TestUdp.cpp" />
+    <ClCompile Include="TestTcp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
