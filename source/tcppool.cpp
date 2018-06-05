@@ -181,22 +181,28 @@ namespace visNETCore{
 
 	bool TcpPool::cleanupConnection(ConnectionIdentifier nId, std::shared_ptr<Socket> pSocket)
 	{
+		/*
+			Retrieves socket status
+		*/
 		bool bAlive = pSocket->getAlive();
 
+		/*
+			Checks if user is manually disconnected by the removeSocket function 
+		*/
 		m_mutDisconnectSockets.lock();
 
-		if (!m_vecDisconnectSockets.empty())
-		{
-			for (auto it = m_vecDisconnectSockets.begin(); it != m_vecDisconnectSockets.end(); ++it)
+			if (!m_vecDisconnectSockets.empty())
 			{
-				if (*it == m_currentIdentifier) // CHECK LOGIC BEHIND THIS!!!!
+				for (auto it = m_vecDisconnectSockets.begin(); it != m_vecDisconnectSockets.end(); ++it)
 				{
-					it = m_vecDisconnectSockets.erase(it);
-					bAlive = false;
-					break;
+					if (*it == nId)
+					{
+						it = m_vecDisconnectSockets.erase(it);
+						bAlive = false;
+						break;
+					}
 				}
 			}
-		}
 
 		m_mutDisconnectSockets.unlock();
 
