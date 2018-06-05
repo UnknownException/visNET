@@ -10,7 +10,7 @@ namespace visNET{
 		m_nCursor = 0;
 		m_eState = PS_WRITABLE;
 
-		writeUInt(0); // First 32 bits in the packet are the packets size
+		writeUInt(0); // First 4 bytes are reserved for the packets size
 	}
 
 	Packet::~Packet()

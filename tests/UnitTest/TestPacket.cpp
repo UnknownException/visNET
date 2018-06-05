@@ -38,10 +38,10 @@ namespace UnitTest
 			/* Create TCP listener and client */
 			Assert::IsTrue(visNET::startup(), L"Failed to startup", LINE_INFO());
 
-			visNET::TcpListener tcpSvr(6123);
+			visNET::TcpListener tcpSvr(TESTPACKET_PORT);
 			Assert::IsTrue(tcpSvr.isValid(), L"Failed to initialize TcpListener", LINE_INFO());
 
-			visNET::TcpClient tcpCl("127.0.0.1", 6123);
+			visNET::TcpClient tcpCl("127.0.0.1", TESTPACKET_PORT);
 			Assert::IsTrue(tcpCl.isValid(), L"Failed to initialize TcpClient", LINE_INFO());
 
 			/* Create Test Packet */
