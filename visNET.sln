@@ -10,6 +10,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visNETInterface", "interfac
 		{24971A48-3C4D-43B0-8222-92C1C34BE841} = {24971A48-3C4D-43B0-8222-92C1C34BE841}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "tests\UnitTest\UnitTest.vcxproj", "{D522DC88-6E29-4677-9EB1-1E6E6785460F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{24971A48-3C4D-43B0-8222-92C1C34BE841} = {24971A48-3C4D-43B0-8222-92C1C34BE841}
+		{5B3DD5D3-6D7D-4DFA-8B4D-85B5D0C36E61} = {5B3DD5D3-6D7D-4DFA-8B4D-85B5D0C36E61}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic|Win32 = Debug Dynamic|Win32
@@ -53,8 +59,27 @@ Global
 		{5B3DD5D3-6D7D-4DFA-8B4D-85B5D0C36E61}.Release|Win32.Build.0 = Release|Win32
 		{5B3DD5D3-6D7D-4DFA-8B4D-85B5D0C36E61}.Release|x64.ActiveCfg = Release|x64
 		{5B3DD5D3-6D7D-4DFA-8B4D-85B5D0C36E61}.Release|x64.Build.0 = Release|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|Win32.ActiveCfg = Debug|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|Win32.Build.0 = Debug|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|x64.ActiveCfg = Debug|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|x64.Build.0 = Debug|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug|Win32.Build.0 = Debug|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug|x64.ActiveCfg = Debug|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug|x64.Build.0 = Debug|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release Dynamic|Win32.ActiveCfg = Release|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release Dynamic|Win32.Build.0 = Release|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release Dynamic|x64.ActiveCfg = Release|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release Dynamic|x64.Build.0 = Release|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release|Win32.ActiveCfg = Release|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release|Win32.Build.0 = Release|Win32
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release|x64.ActiveCfg = Release|x64
+		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC301E79-9B6A-463B-AFEA-2799C2098602}
 	EndGlobalSection
 EndGlobal
