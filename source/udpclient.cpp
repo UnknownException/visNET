@@ -34,11 +34,15 @@ namespace visNETCore{
 		getSocket()->setHandle(s);
 		getSocket()->setNonBlocking(true);
 
+		m_pBuffer = new uint8_t[_visNET_PACKETSIZE_LIMIT];
+
 		setValid();
 	}
 
 	UdpClient::~UdpClient()
 	{
+		if (m_pBuffer)
+			delete[] m_pBuffer;
 	}
 
 	bool UdpClient::send(UdpMessage& message) 
@@ -57,19 +61,17 @@ namespace visNETCore{
 
 		std::vector<UdpMessage> retn;
 
-		uint8_t* buffer = new uint8_t[_visNET_NETWORKBUFFER_SIZE];
-
-		auto result = getSocket()->readFrom(buffer, _visNET_NETWORKBUFFER_SIZE);
+		auto result = getSocket()->readFrom(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
 		while (result.second > 0)
 		{
 			if (result.second >= sizeof(uint32_t))
 			{
 				auto packet = std::make_shared<Packet>();
 				uint32_t nSize = 0;
-				memcpy(&nSize, buffer, sizeof(nSize));
+				memcpy(&nSize, m_pBuffer, sizeof(nSize));
 				if (nSize == result.second)
 				{
-					packet->_onReceive(buffer, result.second);
+					packet->_onReceive(m_pBuffer, result.second);
 					
 					char tmp[INET_ADDRSTRLEN];
 					InetNtop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
@@ -79,10 +81,8 @@ namespace visNETCore{
 				// else the packet will be dropped
 			}
 
-			result = getSocket()->readFrom(buffer, _visNET_NETWORKBUFFER_SIZE);
+			result = getSocket()->readFrom(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
 		}
-
-		delete[] buffer;
 
 		return retn;
 	}

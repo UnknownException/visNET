@@ -3,6 +3,7 @@
 
 namespace visNETCore{
 	class UdpClient : public NetworkObject{
+		uint8_t* m_pBuffer;
 	public:
 		UdpClient(uint16_t nPort);
 		virtual ~UdpClient();
