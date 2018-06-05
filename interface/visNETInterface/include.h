@@ -1,65 +1,18 @@
 #pragma once
 #include <stdint.h>
 #include <memory>
-#include <tuple>
 #include <string>
 #include <vector>
 #include "../../source/blobarray.h"
+#include "../../source/connectionidentifier.h"
+#include "../../source/packet.h"
+#include "../../source/tcpmessage.h"
+#include "../../source/udpmessage.h"
 
 namespace visNET {
 	/* Base Interface */
 	__declspec(dllexport) bool startup();
 	__declspec(dllexport) bool cleanup();
-	
-	/* Packet Interface */
-	class __declspec(dllexport) Packet {
-		friend class TcpClient;
-		friend class TcpListener;
-		friend class UdpClient;
-		friend class PacketInstance;
-		
-		void* packetInstance;
-	protected:
-		void* getInstance() { return packetInstance; };
-
-	public:
-		Packet();
-		// Do not use this constructor, it's for internal purpose
-		Packet(std::shared_ptr<void> instance);
-		virtual ~Packet();
-
-		void writeInt(int32_t n);
-		void writeUInt(uint32_t n);
-		void writeShort(int16_t n);
-		void writeUShort(uint16_t n);
-		void writeChar(int8_t n);
-		void writeUChar(uint8_t n);
-		void writeFloat(float f);
-		void writeDouble(double d);
-		void writeBool(bool b);
-		void writeString(const char* str);
-		void writeString(std::string str) { writeString(str.c_str()); }
-		void writeBlobArray(BlobArray& blob);
-
-		bool readSkip(uint32_t offset);
-
-		int32_t readInt();
-		uint32_t readUInt();
-		int16_t readShort();
-		uint16_t readUShort();
-		int8_t readChar();
-		uint8_t readUChar();
-		float readFloat();
-		double readDouble();
-		bool readBool();
-		std::string readString();
-		bool readBlobArray(BlobArray& blob);
-
-		bool isReadable();
-		bool isValid();
-		bool isWritable();
-		bool isTransfering();
-	};
 
 	/* Tcp Listener Interface */
 	class __declspec(dllexport) TcpListener {
@@ -68,12 +21,13 @@ namespace visNET {
 		TcpListener(uint16_t nPort);
 		virtual ~TcpListener();
 
-		uint32_t getConnection();
+		ConnectionIdentifier getConnection();
 
-		void send(uint32_t nClId, Packet& packet);
-		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets();
-		std::vector<uint32_t> getDisconnected();
-		void disconnect(uint32_t nClId);
+		void send(TcpMessage& message);
+		void send(ConnectionIdentifier identifier, Packet& packet);
+		std::vector<TcpMessage> getPackets();
+		std::vector<ConnectionIdentifier> getDisconnected();
+		void disconnect(ConnectionIdentifier identifier);
 
 		bool isValid();
 		std::string getError();
@@ -88,7 +42,7 @@ namespace visNET {
 		virtual ~TcpClient();
 
 		void send(Packet& pPacket);
-		std::vector<std::pair<uint32_t, std::shared_ptr<Packet>>> getPackets();
+		std::vector<TcpMessage> getPackets();
 		bool isDisconnected();
 
 		bool isValid();
@@ -103,8 +57,9 @@ namespace visNET {
 		UdpClient(uint16_t nPort);
 		virtual ~UdpClient();
 
-		bool send(Packet& pPacket, const char* szIP, unsigned short nPort);
-		std::vector<std::tuple<std::string, uint16_t, std::shared_ptr<Packet>>> getPackets();
+		bool send(UdpMessage& message);
+		bool send(std::string ip, uint16_t port, Packet& packet);
+		std::vector<UdpMessage> getPackets();
 
 		bool isValid();
 		std::string getError();

@@ -91,7 +91,7 @@ namespace UnitTest
 				Assert::AreNotEqual(0, nAttempts, L"Failed to receive a data packet", LINE_INFO());
 			}
 
-			auto pPacket = recv.at(0).second;
+			auto pPacket = recv.at(0).getPacket();
 			Assert::IsTrue(pPacket->isReadable());
 
 			Assert::AreEqual(true, pPacket->readBool(), L"Failed to read bool from packet", LINE_INFO());

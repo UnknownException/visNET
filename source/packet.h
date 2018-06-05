@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNETCore{
+namespace visNET{
 	class Packet{
 		uint32_t m_nSize;
 		uint8_t* m_pData;
@@ -40,7 +40,8 @@ namespace visNETCore{
 		void writeBool(bool b) { write(&b, sizeof(bool)); }
 
 		void writeString(const char* str);
-		void writeBlobArray(visNET::BlobArray& blob); // Efficient way to send multiple objects
+		void writeString(std::string& str) { writeString(str.c_str()); }
+		void writeBlobArray(BlobArray& blob);
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
 	private:
@@ -108,7 +109,7 @@ namespace visNETCore{
 		}
 
 		std::string readString();
-		bool readBlobArray(visNET::BlobArray& blob);
+		bool readBlobArray(BlobArray& blob);
 
 		bool isReadable() { return isState(PS_READABLE); } // When the state is not readable, it hasn't read correctly
 		bool isValid() { return !isState(PS_INVALID); }
@@ -128,23 +129,22 @@ namespace visNETCore{
 		int32_t _onReceive(uint8_t* pData, uint32_t nLength); 
 		bool _onSend(); //Gets called before being send
 
-		void _swap(Packet* packet) {
-			//Save current ones
-			decltype(m_pData) pOldData = m_pData;
-			decltype(m_nSize) nOldSize = m_nSize;
-			decltype(m_eState) eOldState = m_eState;
-			decltype(m_nCursor) nOldCursor = m_nCursor;
+		std::shared_ptr<Packet> _copy() 
+		{
+			if (!isWritable())
+				return nullptr;
 
-			//Transfer values
-			m_pData = packet->m_pData;
-			m_nSize = packet->m_nSize;
-			m_eState = packet->m_eState;
-			m_nCursor = packet->m_nCursor;
+			std::shared_ptr<Packet> copy = std::make_shared<Packet>();
+			// Delete initial 4 bytes
+			if (copy->m_pData)
+			{
+				delete[] copy->m_pData;
+				copy->m_pData = nullptr;
+				copy->m_nSize = 0;
+			}
+			copy->write(m_pData, m_nSize);
 
-			packet->m_pData = pOldData;
-			packet->m_nSize = nOldSize;
-			packet->m_eState = eOldState;
-			packet->m_nCursor = nOldCursor;
+			return copy;
 		}
 	};
 }

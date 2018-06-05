@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "packet.h"
 
-namespace visNETCore{
+namespace visNET{
 	Packet::Packet()
 	{
 		m_nSize = 0;
@@ -44,7 +44,7 @@ namespace visNETCore{
 		write(str, nLen);
 	}
 
-	void Packet::writeBlobArray(visNET::BlobArray& blob)
+	void Packet::writeBlobArray(BlobArray& blob)
 	{
 		if (!isState(PS_WRITABLE))
 			return;
@@ -108,7 +108,7 @@ namespace visNETCore{
 		return result;
 	}
 
-	bool Packet::readBlobArray(visNET::BlobArray& blob)
+	bool Packet::readBlobArray(BlobArray& blob)
 	{
 		if (!isState(PS_READABLE))
 			return false;

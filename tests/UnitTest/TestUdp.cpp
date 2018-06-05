@@ -17,7 +17,7 @@ namespace UnitTest
 			/* Send Packet */
 			visNET::Packet packet;
 			packet.writeDouble(31.5f);
-			udpClient1.send(packet, "127.0.0.1", TESTUDP_PORT2);
+			udpClient1.send("127.0.0.1", TESTUDP_PORT2, packet);
 
 			int32_t nAttempts = 50;
 
@@ -33,7 +33,7 @@ namespace UnitTest
 				Assert::AreNotEqual(0, nAttempts, L"Failed to receive a data packet", LINE_INFO());
 			}
 
-			auto pPacket = std::get<2>(recv.at(0));
+			auto pPacket = recv.at(0).getPacket();
 			Assert::IsTrue(pPacket->isReadable());
 
 			Assert::AreEqual(static_cast<double>(31.5f), pPacket->readDouble(), L"Failed to read double from packet", LINE_INFO());

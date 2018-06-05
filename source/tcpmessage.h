@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNETCore {
+namespace visNET {
 	class TcpMessage {
 	private:
 		ConnectionIdentifier m_connectionIdentifier;

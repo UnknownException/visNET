@@ -1,13 +1,13 @@
 #pragma once
 
-namespace visNETCore {
+namespace visNET {
 	class UdpMessage {
 	private:
 		std::string m_ip;
 		uint16_t m_port;
 		std::shared_ptr<Packet> m_packet;
 	public:
-		UdpMessage(std::string ip, uint16_t port, std::shared_ptr<Packet> packet) {
+		UdpMessage(std::string& ip, uint16_t port, std::shared_ptr<Packet> packet) {
 			m_ip = ip;
 			m_port = port;
 			m_packet = packet;

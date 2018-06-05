@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNETCore {
+namespace visNET {
 	class ConnectionIdentifier {
 		uint32_t m_id;
 
@@ -23,10 +23,6 @@ namespace visNETCore {
 
 		bool isValid() {
 			return m_id != 0;
-		}
-
-		decltype(m_id) getValue() {
-			return m_id;
 		}
 
 		bool operator==(const ConnectionIdentifier& second)
