@@ -44,17 +44,6 @@ namespace visNET{
 		write(str, nLen);
 	}
 
-	void Packet::writeBlobArray(BlobArray& blob)
-	{
-		if (!isState(PS_WRITABLE))
-			return;
-
-		writeUInt(blob.getCount());
-
-		if (blob.getCount() > 0)
-			write(blob.getIndexPtr(0), blob.getArraySize());
-	}
-
 	bool Packet::_read(uint8_t* pBuffer, uint32_t nSize)
 	{
 		if (!isState(PS_READABLE))
@@ -106,36 +95,6 @@ namespace visNET{
 		delete[] pBuffer;
 
 		return result;
-	}
-
-	bool Packet::readBlobArray(BlobArray& blob)
-	{
-		if (!isState(PS_READABLE))
-			return false;
-
-		if (!m_pData || blob.getCount() != 0) // Can't read without data or in an already filled blob
-		{
-			setState(PS_INVALID);
-			return false;
-		}
-
-		uint32_t nBlobCount = readUInt();
-		if (!isState(PS_READABLE))
-			return false;
-
-		// Can't read more data than the packet buffer contains
-		if (m_nCursor + (nBlobCount * blob.getBlobSize()) > m_nSize)
-		{
-			setState(PS_INVALID);
-			return false;
-		}
-
-		if (nBlobCount > 0)
-			blob.add(m_pData + m_nCursor, nBlobCount);
-
-		m_nCursor += nBlobCount * blob.getBlobSize();
-
-		return true;
 	}
 
 	int32_t Packet::_onReceive(uint8_t* pData, uint32_t nLength)
@@ -216,5 +175,23 @@ namespace visNET{
 		memcpy(m_pData, &m_nSize, sizeof(m_nSize)); // Overwrite first 4 bytes
 
 		return true;
+	}
+
+	std::shared_ptr<Packet> Packet::_copy()
+	{
+		if (!isWritable())
+			return nullptr;
+
+		std::shared_ptr<Packet> copy = std::make_shared<Packet>();
+		// Delete initial 4 bytes
+		if (copy->m_pData)
+		{
+			delete[] copy->m_pData;
+			copy->m_pData = nullptr;
+			copy->m_nSize = 0;
+		}
+		copy->write(m_pData, m_nSize);
+
+		return copy;
 	}
 }

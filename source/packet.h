@@ -1,13 +1,13 @@
 #pragma once
 
 namespace visNET{
-	class Packet{
+	class Packet {
 		uint32_t m_nSize;
 		uint8_t* m_pData;
 
 		uint32_t m_nCursor;
 
-		enum PSTATES{
+		enum PSTATES {
 			PS_INVALID,
 			PS_WRITABLE,
 			PS_INRECEIVE,
@@ -25,7 +25,7 @@ namespace visNET{
 		void _write(const uint8_t* data, uint32_t length);
 	public:
 		template<typename T>
-		void write(const T* data, uint32_t length){
+		void write(const T* data, uint32_t length) {
 			_write(reinterpret_cast<const uint8_t*>(data), length);
 		}
 
@@ -41,44 +41,55 @@ namespace visNET{
 
 		void writeString(const char* str);
 		void writeString(std::string& str) { writeString(str.c_str()); }
-		void writeBlobArray(BlobArray& blob);
+
+		template <typename T>
+		void writeBlobArray(BlobArray<T>& blob)
+		{
+			if (!isState(PS_WRITABLE))
+				return;
+
+			writeUInt(blob.getBlobCount());
+
+			if (blob.getBlobCount() > 0)
+				write(blob.get(0), blob.getArraySize());
+		}
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
 	private:
 		bool _read(uint8_t* buffer, uint32_t size);
 	public:
 		template<typename T>
-		bool read(T* buffer, uint32_t size){
+		bool read(T* buffer, uint32_t size) {
 			return _read(reinterpret_cast<uint8_t*>(buffer), size);
 		}
 
 		// Skip an amount of bytes in the received packet
 		bool readSkip(uint32_t offset);
 
-		int32_t readInt(){
+		int32_t readInt() {
 			int32_t n = 0;
 			read(&n, sizeof(int32_t));
 			return n;
 		}
-		uint32_t readUInt(){
+		uint32_t readUInt() {
 			uint32_t n = 0;
 			read(&n, sizeof(uint32_t));
 			return n;
 		}
 
-		int16_t readShort(){
+		int16_t readShort() {
 			int16_t n = 0;
 			read(&n, sizeof(int16_t));
 			return n;
 		}
 
-		uint16_t readUShort(){
+		uint16_t readUShort() {
 			uint16_t n = 0;
 			read(&n, sizeof(int16_t));
 			return n;
 		}
 
-		int8_t readChar(){
+		int8_t readChar() {
 			int8_t n = 0;
 			read(&n, sizeof(int8_t));
 			return n;
@@ -98,18 +109,48 @@ namespace visNET{
 
 		double readDouble() {
 			double d = 0.f;
-			read(&d, sizeof(double));	
+			read(&d, sizeof(double));
 			return d;
 		}
 
-		bool readBool(){
+		bool readBool() {
 			bool b = false;
 			read(&b, sizeof(bool));
 			return b;
 		}
 
 		std::string readString();
-		bool readBlobArray(BlobArray& blob);
+
+		template <typename T>
+		std::shared_ptr<BlobArray<T>> readBlobArray(){
+			auto blob = std::make_shared<BlobArray<T>>();
+			if (!isState(PS_READABLE))
+				return blob;
+
+			if (!m_pData || blob->getBlobCount() != 0) // Can't read without data or in an already filled blob
+			{
+				setState(PS_INVALID);
+				return blob;
+			}
+
+			uint32_t nBlobCount = readUInt();
+			if (!isState(PS_READABLE))
+				return blob;
+
+			// Can't read more data than the packet buffer contains
+			if (m_nCursor + (nBlobCount * blob->getBlobSize()) > m_nSize)
+			{
+				setState(PS_INVALID);
+				return blob;
+			}
+
+			if (nBlobCount > 0)
+				blob->add((T*)(m_pData + m_nCursor), nBlobCount);
+
+			m_nCursor += nBlobCount * blob->getBlobSize();
+
+			return blob;
+		}
 
 		bool isReadable() { return isState(PS_READABLE); } // When the state is not readable, it hasn't read correctly
 		bool isValid() { return !isState(PS_INVALID); }
@@ -126,25 +167,8 @@ namespace visNET{
 		// 0: Packet is correct
 		// >0: Packet is finished, we have additional data (new packet)
 
-		int32_t _onReceive(uint8_t* pData, uint32_t nLength); 
+		int32_t _onReceive(uint8_t* pData, uint32_t nLength);
 		bool _onSend(); //Gets called before being send
-
-		std::shared_ptr<Packet> _copy() 
-		{
-			if (!isWritable())
-				return nullptr;
-
-			std::shared_ptr<Packet> copy = std::make_shared<Packet>();
-			// Delete initial 4 bytes
-			if (copy->m_pData)
-			{
-				delete[] copy->m_pData;
-				copy->m_pData = nullptr;
-				copy->m_nSize = 0;
-			}
-			copy->write(m_pData, m_nSize);
-
-			return copy;
-		}
+		std::shared_ptr<Packet> _copy();
 	};
 }
