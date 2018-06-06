@@ -67,6 +67,9 @@ namespace UnitTest
 
 			packet.writeBlobArray(blob);
 
+			packet.writeShort(33); // Skip test
+			packet.writeShort(34);
+
 			/* Send Test Packet */
 			tcpCl.send(packet);
 
@@ -121,6 +124,9 @@ namespace UnitTest
 			Assert::AreEqual(33, *recvBlob->get(1), L"Blob value 2 is incorrect", LINE_INFO());
 			Assert::AreEqual(34, *recvBlob->get(2), L"Blob value 3 is incorrect", LINE_INFO());
 
+			Assert::AreEqual(true, pPacket->readSkip(sizeof(int16_t)), L"Failed to skip parts of packet", LINE_INFO());
+			Assert::AreEqual(static_cast<int16_t>(34), pPacket->readShort(), L"Failed to read short after skip", LINE_INFO());
+
 			/* Shutdown Winsock */
 			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());
 		}
@@ -154,6 +160,9 @@ namespace UnitTest
 			blob.add(valArr, 2);
 
 			packet.writeBlobArray(blob);
+
+			packet.writeShort(33); // Skip test
+			packet.writeShort(34);
 
 			udpClient1.send("127.0.0.1", TESTPACKET_PORT3, packet);
 
@@ -191,6 +200,9 @@ namespace UnitTest
 			Assert::AreEqual(1, *recvBlob->get(0), L"Blob value 1 is incorrect", LINE_INFO());
 			Assert::AreEqual(33, *recvBlob->get(1), L"Blob value 2 is incorrect", LINE_INFO());
 			Assert::AreEqual(34, *recvBlob->get(2), L"Blob value 3 is incorrect", LINE_INFO());
+
+			Assert::AreEqual(true, pPacket->readSkip(sizeof(int16_t)), L"Failed to skip parts of packet", LINE_INFO());
+			Assert::AreEqual(static_cast<int16_t>(34), pPacket->readShort(), L"Failed to read short after skip", LINE_INFO());
 
 			/* Shutdown Winsock */
 			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());

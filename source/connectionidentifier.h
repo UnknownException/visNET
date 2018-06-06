@@ -29,5 +29,10 @@ namespace visNET {
 		{
 			return m_id == second.m_id;
 		}
+
+		bool operator!=(const ConnectionIdentifier& second)
+		{
+			return !(*this == second);
+		}
 	};
 }

@@ -26,9 +26,6 @@ namespace UnitTest
 			/* Send to peer udpClient3; Should not receive at peer udpClient4 */
 			visNET::Packet packet2;
 			Assert::IsTrue(udpClient1.send("127.0.0.1", TESTUDP_PORT5, packet));
-			
-			/* Halt execution */
-			Sleep(100);
 
 			/* Get received packet size from invalid peer */
 			Assert::AreEqual(static_cast<size_t>(0), udpClient4.getPackets().size(), L"Invalid peer 4 received a packet", LINE_INFO());
@@ -43,9 +40,6 @@ namespace UnitTest
 			/* Send to peer udpClient2 from peer udpClient3 */
 			visNET::Packet packet4;
 			Assert::IsTrue(udpClient3.send("127.0.0.1", TESTUDP_PORT4, packet));
-
-			/* Halt execution */
-			Sleep(100);
 
 			/* Get received packet size from valid peer */
 			Assert::AreEqual(static_cast<size_t>(1), udpClient1.getPackets().size(), L"Valid peer 1 didn't receive a packet", LINE_INFO());

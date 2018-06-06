@@ -340,5 +340,107 @@ namespace UnitTest
 			/* Shutdown Winsock */
 			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());
 		}
+
+		TEST_METHOD(TestTcpPerformance)
+		{
+			uint32_t curTime = timeGetTime();
+
+			/* Create TCP listener and client */
+			Assert::IsTrue(visNET::startup(), L"Failed to startup", LINE_INFO());
+
+			visNET::TcpListener tcpSvr(TESTTCP_PORT7);
+			Assert::IsTrue(tcpSvr.isValid(), L"Failed to initialize TcpListener", LINE_INFO());
+
+			visNET::TcpClient tcpCl("127.0.0.1", TESTTCP_PORT7);
+			Assert::IsTrue(tcpCl.isValid(), L"Failed to initialize TcpClient", LINE_INFO());
+
+			/* Create Test Packet */
+			visNET::Packet packet;
+			packet.writeDouble(31.5f);
+
+			/* Send Test Packet */
+			tcpCl.send(packet);
+
+			/* Receive attempts */
+			int32_t nAttempts = 5000;
+
+			/* Accept Connection */
+			auto connectionId = tcpSvr.getConnection();
+			while (connectionId == 0)
+			{
+				connectionId = tcpSvr.getConnection();
+				nAttempts--;
+				Assert::AreNotEqual(0, nAttempts, L"Failed to establish a connection", LINE_INFO());
+			}
+
+			/* Reset attempts */
+			nAttempts = 5000;
+
+			/* Receive Packet */
+			auto recv = tcpSvr.getPackets();
+			while (recv.empty())
+			{
+				recv = tcpSvr.getPackets();
+				nAttempts--;
+				Assert::AreNotEqual(0, nAttempts, L"Failed to receive a data packet", LINE_INFO());
+			}
+
+			auto pPacket = recv.at(0).getPacket();
+			Assert::IsTrue(pPacket->isReadable());
+
+			Assert::AreEqual(static_cast<double>(31.5f), pPacket->readDouble(), L"Failed to read double from packet", LINE_INFO());
+
+			// Sleep performance....
+			Assert::IsFalse(curTime + 5 < timeGetTime(), L"Failed to deliver local packet in time", LINE_INFO());
+
+			/* Shutdown Winsock */
+			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());
+		}
+
+		TEST_METHOD(DisconnectClient)
+		{
+			/* Create TCP listener and client */
+			Assert::IsTrue(visNET::startup(), L"Failed to startup", LINE_INFO());
+
+			visNET::TcpListener tcpSvr(TESTTCP_PORT8);
+			Assert::IsTrue(tcpSvr.isValid(), L"Failed to initialize TcpListener", LINE_INFO());
+
+			visNET::TcpClient tcpCl("127.0.0.1", TESTTCP_PORT8);
+			Assert::IsTrue(tcpCl.isValid(), L"Failed to initialize TcpClient", LINE_INFO());
+
+			int32_t nAttempts = 50;
+
+			/* Accept Connection */
+			auto connectionId = tcpSvr.getConnection();
+			while (connectionId == 0)
+			{
+				connectionId = tcpSvr.getConnection();
+
+				// Halt execution
+				Sleep(1);
+				nAttempts--;
+				Assert::AreNotEqual(0, nAttempts, L"Failed to establish a connection", LINE_INFO());
+			}
+
+			tcpSvr.disconnect(connectionId);
+			
+			auto disconnected = tcpSvr.getDisconnected();
+			while (disconnected.empty())
+			{
+				disconnected = tcpSvr.getDisconnected();
+
+				Sleep(1);
+				nAttempts--;
+				Assert::AreNotEqual(0, nAttempts, L"Failed to disconnect a connection", LINE_INFO());
+			}
+
+			if(connectionId != disconnected.at(0))
+				Assert::IsTrue(false, L"Disconnection id does not match", LINE_INFO());
+
+			Assert::IsTrue(tcpCl.isDisconnected(), L"TCP client is giving the wrong state", LINE_INFO());
+
+			/* Shutdown Winsock */
+			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());
+		}
 	};
 }
