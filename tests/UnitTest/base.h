@@ -13,7 +13,9 @@
 	#pragma comment(lib, "../../Win32/Release/visNETInterface.lib")
 #endif
 
-#define TESTPACKET_PORT 6101
+#define TESTPACKET_PORT1 6101
+#define TESTPACKET_PORT2 6102
+#define TESTPACKET_PORT3 6103
 
 #define TESTTCP_PORT1 6201
 #define TESTTCP_PORT2 6202
@@ -24,3 +26,6 @@
 
 #define TESTUDP_PORT1 6301
 #define TESTUDP_PORT2 6302
+#define TESTUDP_PORT3 6303
+#define TESTUDP_PORT4 6304
+#define TESTUDP_PORT5 6305

@@ -4,6 +4,8 @@
 namespace visNETCore{
 	UdpClient::UdpClient(uint16_t nPort)
 	{
+		m_pBuffer = new uint8_t[_visNET_PACKETSIZE_LIMIT];
+
 		addrinfo hints, *result;
 		ZeroMemory(&hints, sizeof(addrinfo));
 		hints.ai_family = AF_INET;
@@ -33,8 +35,6 @@ namespace visNETCore{
 
 		getSocket()->setHandle(s);
 		getSocket()->setNonBlocking(true);
-
-		m_pBuffer = new uint8_t[_visNET_PACKETSIZE_LIMIT];
 
 		setValid();
 	}
