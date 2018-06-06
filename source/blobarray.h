@@ -46,34 +46,34 @@ namespace visNET{
 			add(&item, 1);
 		}
 
-		void add(T* items, uint32_t nCount)
+		void add(T* items, uint32_t itemCount)
 		{
 #ifdef _visNET_STRICT_REALLOC
-			if (m_nBlobCount != 0 || nCount > 1)
-				m_pData = (uint8_t*)realloc(m_pData, (m_nBlobCount + nCount) * m_nBlobSize);
+			if (m_nBlobCount != 0 || itemCount > 1)
+				m_pData = (uint8_t*)realloc(m_pData, (m_nBlobCount + itemCount) * m_nBlobSize);
 #else
-			uint32_t nDiff = 0;
-			if (m_nBlobCount + nCount > m_nBlobLimit)
-				nDiff = (m_nBlobCount + nCount) - m_nBlobLimit;
+			uint32_t difference = 0;
+			if (m_nBlobCount + itemCount > m_nBlobLimit)
+				difference = (m_nBlobCount + itemCount) - m_nBlobLimit;
 
-			if (nDiff > 0)
+			if (difference > 0)
 			{
-				m_nBlobLimit = m_nBlobCount + nDiff; // Make room for the additional blobs
-				m_nBlobLimit = (uint32_t)((m_nBlobLimit + 10) * _visNET_LOOSE_REALLOC); // Add 10 slots, and an additional percentage of the current slots
+				m_nBlobLimit = m_nBlobCount + difference; // Make room for the additional blobs
+				m_nBlobLimit = static_cast<uint32_t>((m_nBlobLimit + 10) * _visNET_LOOSE_REALLOC); // Add 10 slots, and an additional percentage of the current slots
 
-				m_pData = (uint8_t*)realloc(m_pData, m_nBlobLimit * m_nBlobSize);
+				m_pData = static_cast<uint8_t*>(realloc(m_pData, m_nBlobLimit * m_nBlobSize));
 			}
 #endif
 
-			memcpy(m_pData + (m_nBlobSize * m_nBlobCount), reinterpret_cast<uint8_t*>(items), m_nBlobSize * nCount);
-			m_nBlobCount += nCount;
+			memcpy(m_pData + (m_nBlobSize * m_nBlobCount), reinterpret_cast<uint8_t*>(items), m_nBlobSize * itemCount);
+			m_nBlobCount += itemCount;
 		}
 
-		T* get(uint32_t nIndex){
-			if (m_nBlobCount == 0 || nIndex > m_nBlobCount - 1)
+		T* get(uint32_t index){
+			if (m_nBlobCount == 0 || index > m_nBlobCount - 1)
 				return nullptr;
 
-			return (T*)(m_pData + (m_nBlobSize * nIndex));
+			return reinterpret_cast<T*>(m_pData + (m_nBlobSize * index));
 		}
 
 		uint32_t getArraySize() { return m_nBlobSize * m_nBlobCount; }

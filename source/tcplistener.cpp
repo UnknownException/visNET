@@ -99,7 +99,7 @@ namespace visNETCore{
 		if (!isValid())
 			return  std::vector<ConnectionIdentifier>();
 
-		return m_pTcpPool->getDisconnected(false);
+		return m_pTcpPool->getDisconnected();
 	}
 	
 	void TcpListener::disconnect(ConnectionIdentifier clientId) 

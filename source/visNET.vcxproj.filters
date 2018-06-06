@@ -49,6 +49,9 @@
     <ClInclude Include="connectionidentifier.h">
       <Filter>Structure</Filter>
     </ClInclude>
+    <ClInclude Include="identifiablesocket.h">
+      <Filter>Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">

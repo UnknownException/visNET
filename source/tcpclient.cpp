@@ -53,6 +53,8 @@ namespace visNETCore{
 		}
 
 		m_pTcpPool = new TcpPool;
+		m_pTcpPool->SetKeepHistory(true);
+
 		m_serverIdentifier = m_pTcpPool->addSocket(std::make_shared<Socket>(*getSocket()));
 
 		setValid();
@@ -85,6 +87,6 @@ namespace visNETCore{
 		if (!isValid())
 			return true;
 
-		return !m_pTcpPool->getDisconnected(true).empty();
+		return !m_pTcpPool->getDisconnected().empty();
 	}
 }

@@ -19,10 +19,10 @@ namespace visNETCore{
 		std::vector<TcpMessage> m_vecRecvPackets;
 
 		std::mutex m_mutNewSockets;
-		std::vector<std::pair<ConnectionIdentifier, std::shared_ptr<Socket>>> m_vecNewSockets;
+		std::vector<IdentifiableSocket> m_vecNewSockets;
 		std::mutex m_mutDisconnectSockets;
 		std::vector<ConnectionIdentifier> m_vecDisconnectSockets;
-		std::vector<std::pair<ConnectionIdentifier, std::shared_ptr<Socket>>> m_vecSockets;
+		std::vector<IdentifiableSocket> m_vecSockets;
 
 		std::mutex m_mutDisconnected;
 		std::vector<ConnectionIdentifier> m_vecDisconnected;
@@ -31,6 +31,8 @@ namespace visNETCore{
 		std::unique_ptr<std::thread> m_pThread;
 
 		uint8_t* m_pBuffer;
+
+		bool m_bKeepHistory;
 	public:
 		TcpPool();
 		virtual ~TcpPool();
@@ -40,17 +42,20 @@ namespace visNETCore{
 	public:
 		ConnectionIdentifier addSocket(std::shared_ptr<Socket> s);
 		void removeSocket(ConnectionIdentifier id);
-		std::vector<ConnectionIdentifier> getDisconnected(bool bKeepHistory);
+		std::vector<ConnectionIdentifier> getDisconnected();
+		void SetKeepHistory(bool b) { m_bKeepHistory = b; }
 
 		std::vector<TcpMessage> getPackets();
 		void sendPacket(TcpMessage& message);
 	private:
-		void run();
-		void acceptConnections();
-		bool cleanupConnection(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
+		// Network thread variables and functionality
+		std::vector<TcpMessage> m_vecTransferPackets; 
 
-		std::vector<TcpMessage> m_vecTransferPackets;
-		std::vector<TcpMessage> recvPackets(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
-		void sendPackets(ConnectionIdentifier id, std::shared_ptr<Socket> pSocket);
+		void run();
+
+		void acceptConnections();
+		bool cleanupConnection(IdentifiableSocket* identifiableSocket);
+		std::vector<TcpMessage> recvPackets(IdentifiableSocket* identifiableSocket);
+		void sendPackets(IdentifiableSocket* identifiableSocket);
 	};
 }

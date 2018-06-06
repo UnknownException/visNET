@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClInclude Include="blobarray.h" />
     <ClInclude Include="connectionidentifier.h" />
+    <ClInclude Include="identifiablesocket.h" />
     <ClInclude Include="tcpclient.h" />
     <ClInclude Include="networkobject.h" />
     <ClInclude Include="tcpmessage.h" />

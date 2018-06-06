@@ -23,7 +23,7 @@ namespace visNET {
 	
 	TcpListener::~TcpListener()
 	{
-		delete tcpListener;
+		delete (visNETCore::TcpListener*)tcpListener;
 	}
 
 	ConnectionIdentifier TcpListener::getConnection()
@@ -78,7 +78,7 @@ namespace visNET {
 
 	TcpClient::~TcpClient()
 	{
-		delete tcpClient;
+		delete (visNETCore::TcpClient*)tcpClient;
 	}
 
 	void TcpClient::send(Packet& packet)
@@ -117,7 +117,7 @@ namespace visNET {
 
 	UdpClient::~UdpClient()
 	{
-		delete udpClient;
+		delete (visNETCore::UdpClient*)udpClient;
 	}
 
 	bool UdpClient::send(UdpMessage& message)

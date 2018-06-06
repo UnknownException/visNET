@@ -31,6 +31,7 @@
 using namespace visNET;
 
 #include "socket.h"
+#include "identifiablesocket.h"
 #include "tcppool.h"
 #include "tcplistener.h"
 #include "tcpclient.h"
