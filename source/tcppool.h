@@ -5,12 +5,14 @@
 #include <atomic>
 #include <mutex>
 
+#include "identifiablesocket.h"
+
 /*
 	Manages TCP input and output stream
 	Converts reveived chunks back into complete packets
 */
 
-namespace visNETCore{
+namespace visNET{
 	class TcpPool{
 		ConnectionIdentifier m_currentIdentifier;
 		std::mutex m_mutReserveID;

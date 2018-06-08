@@ -11,7 +11,7 @@ namespace UnitTest
 		{
 			auto pArray = new visNET::BlobArray<uint32_t>();
 			// Asure that the reserving size for blobarray instances is 4 bytes
-			Assert::AreEqual(sizeof(uint32_t), pArray->getBlobSize());
+			Assert::AreEqual((uint32_t)sizeof(uint32_t), pArray->getBlobSize());
 
 			// Add 32 numbers ranging from 0 to 31
 			uint32_t testCount = 32;
@@ -22,17 +22,17 @@ namespace UnitTest
 			Assert::AreEqual(testCount, pArray->getBlobCount());
 
 			// Assure that the claimed datasize is correct
-			Assert::AreEqual(testCount * sizeof(uint32_t), pArray->getArraySize());
+			Assert::AreEqual(testCount * (uint32_t)sizeof(uint32_t), pArray->getArraySize());
 		}
 
 		TEST_METHOD(GetItemWithIndex)
 		{
-#define GETINDEXPOINTER_TESTVAL1 44
-#define GETINDEXPOINTER_TESTVAL2 45
+			const uint32_t GETINDEXPOINTER_TESTVAL1 = 44;
+			const uint32_t GETINDEXPOINTER_TESTVAL2 = 45;
 
 			visNET::BlobArray<uint32_t> blob;
 			// Asure that the reserving size for blobarray instances is 4 bytes
-			Assert::AreEqual(sizeof(uint32_t), blob.getBlobSize());
+			Assert::AreEqual((uint32_t)sizeof(uint32_t), blob.getBlobSize());
 
 			uint32_t val[] = { GETINDEXPOINTER_TESTVAL1, GETINDEXPOINTER_TESTVAL2 };
 			blob.add(val, 2);
@@ -56,9 +56,6 @@ namespace UnitTest
 			// Retrieve invalid pointer; Should flipover due to unsigned integer casting
 			idxPtr = blob.get(-1);
 			Assert::IsNull(idxPtr);
-
-#undef GETINDEXPOINTER_TESTVAL2
-#undef GETINDEXPOINTER_TESTVAL1
 		}
 	};
 }

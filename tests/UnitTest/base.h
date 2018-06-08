@@ -6,11 +6,36 @@
 
 #include <Windows.h>
 #include <CppUnitTest.h>
-#include "../../interface/visNETInterface/include.h"
+#include "../../source/visnet.h"
+
 #ifdef _DEBUG
-	#pragma comment(lib, "../../Win32/Debug/visNETInterface.lib")
+	#ifdef _DYNAMIC
+		#ifdef _WIN64
+			#pragma comment(lib, "../../bin/x64/Debug Dynamic/visNET.lib")
+		#else
+			#pragma comment(lib, "../../bin/Win32/Debug Dynamic/visNET.lib")
+		#endif
+	#else
+		#ifdef _WIN64
+			#pragma comment(lib, "../../bin/x64/Debug/visNET.lib")
+		#else
+			#pragma comment(lib, "../../bin/Win32/Debug/visNET.lib")
+		#endif
+	#endif
 #else
-	#pragma comment(lib, "../../Win32/Release/visNETInterface.lib")
+	#ifdef _DYNAMIC
+		#ifdef _WIN64
+			#pragma comment(lib, "../../bin/x64/Release Dynamic/visNET.lib")
+		#else
+			#pragma comment(lib, "../../bin/Win32/Release Dynamic/visNET.lib")
+		#endif
+	#else
+		#ifdef _WIN64
+			#pragma comment(lib, "../../bin/x64/Release/visNET.lib")
+		#else
+			#pragma comment(lib, "../../bin/Win32/Release/visNET.lib")
+		#endif
+	#endif
 #endif
 
 #pragma comment(lib, "winmm.lib")

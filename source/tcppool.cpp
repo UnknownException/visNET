@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "tcppool.h"
 
-namespace visNETCore{
+namespace visNET{
 	TcpPool::TcpPool()
 	{
 		m_bPacketsAvailable = false;

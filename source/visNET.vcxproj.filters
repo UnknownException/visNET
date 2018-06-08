@@ -73,5 +73,8 @@
       <Filter>Helper</Filter>
     </ClCompile>
     <ClCompile Include="visnet.cpp" />
+    <ClCompile Include="networkobject.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

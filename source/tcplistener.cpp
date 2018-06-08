@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "tcplistener.h"
 
-namespace visNETCore{
+namespace visNET{
 	TcpListener::TcpListener(uint16_t nPort)
 	{
 		m_pTcpPool = nullptr;
@@ -84,6 +84,11 @@ namespace visNETCore{
 			return;
 
 		m_pTcpPool->sendPacket(message); 
+	}
+
+	void TcpListener::send(ConnectionIdentifier identifier, Packet& packet)
+	{
+		send(TcpMessage(identifier, packet._copy()));
 	}
 	
 	std::vector<TcpMessage> TcpListener::getPackets() 

@@ -4,13 +4,15 @@
 #include <memory>
 #include <vector>
 
-#ifdef _WIN32
-#include <WinSock2.h>
-#include <WS2tcpip.h>
+#ifdef _BUILDLIBRARY
+	#ifdef _WIN32
+	#include <WinSock2.h>
+	#include <WS2tcpip.h>
 
-#pragma comment(lib, "ws2_32.lib")
-#else
-//Linux libs...
+	#pragma comment(lib, "ws2_32.lib")
+	#else
+	//Linux libs...
+	#endif
 #endif
 
 #define _visNET_PACKETSIZE_LIMIT 0xFFFF // Set packetsize limit to the maximum value of an unsigned short; packets bigger than this will be completely ignored
@@ -23,16 +25,16 @@
 #include "tcpmessage.h"
 #include "udpmessage.h"
 
-using namespace visNET;
-
+#ifdef _BUILDLIBRARY
 #include "socket.h"
-#include "identifiablesocket.h"
 #include "tcppool.h"
+#endif
+
 #include "tcplistener.h"
 #include "tcpclient.h"
 #include "udpclient.h"
 
-namespace visNETCore{
-	bool startup();
-	bool cleanup();
+namespace visNET{
+	__declspec(dllexport) bool startup();
+	__declspec(dllexport) bool cleanup();
 }

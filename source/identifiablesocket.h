@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNETCore {
+namespace visNET{
 	class IdentifiableSocket {
 	private:
 		ConnectionIdentifier m_socketIdentifier;

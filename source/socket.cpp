@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "socket.h"
 
-namespace visNETCore{
+namespace visNET{
 	Socket::Socket()
 	{
 		m_handle = INVALID_SOCKET;

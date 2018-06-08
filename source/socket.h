@@ -1,6 +1,6 @@
 #pragma once
 
-namespace visNETCore{
+namespace visNET{
 	class Socket{
 		SOCKET m_handle;
 		bool m_bAlive;

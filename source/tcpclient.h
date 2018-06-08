@@ -7,9 +7,13 @@
 	This class will connect to a listener
 */
 
-namespace visNETCore{
-	class TcpClient : public NetworkObject{
+namespace visNET{
+	class __declspec(dllexport) TcpClient : public NetworkObject{
+#ifdef _BUILDLIBRARY
 		TcpPool* m_pTcpPool;
+#else
+		void* m_pTcpPool;
+#endif
 		ConnectionIdentifier m_serverIdentifier;
 
 	public:
@@ -17,6 +21,8 @@ namespace visNETCore{
 		virtual ~TcpClient();
 
 		void send(std::shared_ptr<Packet> pPacket);
+		void send(Packet& pPacket);
+
 		std::vector<TcpMessage> getPackets();
 		bool isDisconnected();
 	};

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace visNET {
-	class ConnectionIdentifier {
+	class __declspec(dllexport) ConnectionIdentifier {
 		uint32_t m_id;
 
 	public:

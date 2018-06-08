@@ -1,7 +1,7 @@
 #pragma once
 
 namespace visNET{
-	class Packet {
+	class __declspec(dllexport) Packet {
 		uint32_t m_nSize;
 		uint8_t* m_pData;
 

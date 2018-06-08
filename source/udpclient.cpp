@@ -1,7 +1,7 @@
 #include "visnet.h"
 #include "udpclient.h"
 
-namespace visNETCore{
+namespace visNET{
 	UdpClient::UdpClient(uint16_t nPort)
 	{
 		// Reserve buffer for one full packet and checksum
@@ -57,6 +57,11 @@ namespace visNETCore{
 			
 		memcpy(m_pBuffer + sizeof(uint32_t), message.getPacket()->_getRawData(), message.getPacket()->_getRawSize());
 		return getSocket()->writeTo(m_pBuffer, message.getPacket()->_getRawSize() + sizeof(uint32_t), message.getIP().c_str(), message.getPort());
+	}
+
+	bool UdpClient::send(std::string ip, uint16_t port, Packet& packet)
+	{
+		return send(UdpMessage(ip, port, packet._copy()));
 	}
 
 	std::vector<UdpMessage> UdpClient::getPackets()
