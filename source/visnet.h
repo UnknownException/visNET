@@ -1,13 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <atomic>
-#include <mutex>
-#include <thread>
-#include <queue>
 #include <stdint.h>
 #include <memory>
+#include <vector>
 
 #ifdef _WIN32
 #include <WinSock2.h>

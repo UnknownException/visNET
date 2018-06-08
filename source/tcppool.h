@@ -1,5 +1,10 @@
 #pragma once
 
+#include <thread>
+#include <queue>
+#include <atomic>
+#include <mutex>
+
 /*
 	Manages TCP input and output stream
 	Converts reveived chunks back into complete packets

@@ -1,7 +1,6 @@
 #pragma once
 #include <stdint.h>
 #include <memory>
-#include <string>
 #include <vector>
 #include "../../source/blobarray.h"
 #include "../../source/connectionidentifier.h"
