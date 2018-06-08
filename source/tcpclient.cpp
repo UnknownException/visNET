@@ -17,7 +17,7 @@ namespace visNET{
 
 		if (getaddrinfo(pszIp, szBuff, &hints, &result) != 0)
 		{
-			setError("[TcpClient] getaddrinfo has failed");
+			setError("getaddrinfo has failed");
 			return;
 		}
 
@@ -26,7 +26,7 @@ namespace visNET{
 			SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 			if (s == INVALID_SOCKET)
 			{
-				setError("[TcpClient] Failed to create socket");
+				setError("Failed to create socket");
 				return;
 			}
 
@@ -48,7 +48,7 @@ namespace visNET{
 
 		if (getSocket()->getHandle() == INVALID_SOCKET)
 		{
-			setError("[Client] Failed to connect to a socket");
+			setError("Failed to connect to a socket");
 			return;
 		}
 

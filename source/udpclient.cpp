@@ -19,7 +19,7 @@ namespace visNET{
 		SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 		if (s == INVALID_SOCKET)
 		{
-			setError("[UdpClient] Failed to create a socket");
+			setError("Failed to create a socket");
 			return;
 		}
 
@@ -30,7 +30,7 @@ namespace visNET{
 
 		if (bind(s, reinterpret_cast<sockaddr*>(&addr), sizeof(sockaddr_in)) < 0)
 		{
-			setError("[UdpListener] Failed to bind to the socket");
+			setError("Failed to bind to the socket");
 			return;
 		}
 

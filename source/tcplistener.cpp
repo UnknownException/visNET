@@ -19,14 +19,14 @@ namespace visNET{
 
 		if (getaddrinfo(NULL, szBuff, &hints, &result) != 0)
 		{
-			setError("[TcpListener] Failed to get address info");
+			setError("Failed to get address info");
 			return;
 		}
 
 		SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 		if (s == INVALID_SOCKET)
 		{
-			setError("[TcpListener] Failed to create a socket");
+			setError("Failed to create a socket");
 			return;
 		}
 
@@ -39,13 +39,13 @@ namespace visNET{
 
 		if (bind(s, reinterpret_cast<sockaddr*>(&addr), sizeof(sockaddr_in)) < 0)
 		{
-			setError("[TcpListener] Failed to bind to the socket");
+			setError("Failed to bind to the socket");
 			return;
 		}
 
 		if (listen(s, SOMAXCONN) == SOCKET_ERROR)
 		{
-			setError("[TcpListener] Failed to listen to the socket");
+			setError("Failed to listen to the socket");
 			return;
 		}
 

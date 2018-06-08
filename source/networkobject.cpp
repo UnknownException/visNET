@@ -15,9 +15,9 @@ namespace visNET {
 		delete m_strError;
 	}
 
-	const std::string NetworkObject::getError()
+	const char* NetworkObject::getError()
 	{
-		return std::string(m_strError->c_str());
+		return m_strError->c_str();
 	}
 
 	void NetworkObject::setError(const char* pszError) 

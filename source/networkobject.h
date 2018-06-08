@@ -27,7 +27,7 @@ namespace visNET{
 #endif
 
 	public:
-		const std::string getError();
+		const char* getError();
 	protected:
 		void setError(const char* pszError);
 
