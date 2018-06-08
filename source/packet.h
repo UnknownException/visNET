@@ -29,12 +29,14 @@ namespace visNET{
 			_write(reinterpret_cast<const uint8_t*>(data), length);
 		}
 
-		void writeInt(int32_t n) { write(&n, sizeof(int32_t)); }
-		void writeUInt(uint32_t n) { write(&n, sizeof(uint32_t)); }
-		void writeShort(int16_t n) { write(&n, sizeof(int16_t)); }
-		void writeUShort(uint16_t n) { write(&n, sizeof(uint16_t)); }
-		void writeChar(int8_t n) { write(&n, sizeof(int8_t)); }
-		void writeUChar(uint8_t n) { write(&n, sizeof(uint8_t)); }
+		void writeInt8(int8_t n) { write(&n, sizeof(int8_t)); }
+		void writeInt16(int16_t n) { write(&n, sizeof(int16_t)); }
+		void writeInt32(int32_t n) { write(&n, sizeof(int32_t)); }
+		void writeInt64(int64_t n) { write(&n, sizeof(int64_t)); }
+		void writeUInt8(uint8_t n) { write(&n, sizeof(uint8_t)); }
+		void writeUInt16(uint16_t n) { write(&n, sizeof(uint16_t)); }
+		void writeUInt32(uint32_t n) { write(&n, sizeof(uint32_t)); }
+		void writeUInt64(uint64_t n) { write(&n, sizeof(uint64_t)); }
 		void writeFloat(float f) { write(&f, sizeof(float)); }
 		void writeDouble(double d) { write(&d, sizeof(double)); }
 		void writeBool(bool b) { write(&b, sizeof(bool)); }
@@ -48,7 +50,7 @@ namespace visNET{
 			if (!isState(PS_WRITABLE))
 				return;
 
-			writeUInt(blob.getBlobCount());
+			writeUInt32(blob.getBlobCount());
 
 			if (blob.getBlobCount() > 0)
 				write(blob.get(0), blob.getArraySize());
@@ -66,38 +68,51 @@ namespace visNET{
 		// Skip an amount of bytes in the received packet
 		bool readSkip(uint32_t offset);
 
-		int32_t readInt() {
-			int32_t n = 0;
-			read(&n, sizeof(int32_t));
-			return n;
-		}
-		uint32_t readUInt() {
-			uint32_t n = 0;
-			read(&n, sizeof(uint32_t));
-			return n;
-		}
-
-		int16_t readShort() {
-			int16_t n = 0;
-			read(&n, sizeof(int16_t));
-			return n;
-		}
-
-		uint16_t readUShort() {
-			uint16_t n = 0;
-			read(&n, sizeof(int16_t));
-			return n;
-		}
-
-		int8_t readChar() {
+		int8_t readInt8() {
 			int8_t n = 0;
 			read(&n, sizeof(int8_t));
 			return n;
 		}
 
-		uint8_t readUChar() {
+		int16_t readInt16() {
+			int16_t n = 0;
+			read(&n, sizeof(int16_t));
+			return n;
+		}
+
+		int32_t readInt32() {
+			int32_t n = 0;
+			read(&n, sizeof(int32_t));
+			return n;
+		}
+
+		int64_t readInt64() {
+			int64_t n = 0;
+			read(&n, sizeof(int64_t));
+			return n;
+		}
+
+		uint8_t readUInt8() {
 			uint8_t n = 0;
 			read(&n, sizeof(uint8_t));
+			return n;
+		}
+
+		uint16_t readUInt16() {
+			uint16_t n = 0;
+			read(&n, sizeof(int16_t));
+			return n;
+		}
+
+		uint32_t readUInt32() {
+			uint32_t n = 0;
+			read(&n, sizeof(uint32_t));
+			return n;
+		}
+
+		uint64_t readUInt64() {
+			uint64_t n = 0;
+			read(&n, sizeof(uint64_t));
 			return n;
 		}
 
@@ -133,7 +148,7 @@ namespace visNET{
 				return blob;
 			}
 
-			uint32_t nBlobCount = readUInt();
+			uint32_t nBlobCount = readUInt32();
 			if (!isState(PS_READABLE))
 				return blob;
 

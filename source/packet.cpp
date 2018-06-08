@@ -10,7 +10,7 @@ namespace visNET{
 		m_nCursor = 0;
 		m_eState = PS_WRITABLE;
 
-		writeUInt(0); // First 4 bytes are reserved for the packets size
+		writeUInt32(0); // First 4 bytes are reserved for the packets size
 	}
 
 	Packet::~Packet()
@@ -43,7 +43,7 @@ namespace visNET{
 
 		uint32_t nLen = strlen(str);
 		
-		writeUInt(nLen);
+		writeUInt32(nLen);
 		write(str, nLen);
 	}
 
@@ -83,7 +83,7 @@ namespace visNET{
 
 	std::string Packet::readString()
 	{
-		uint32_t nLen = readUInt();
+		uint32_t nLen = readUInt32();
 		if (!isState(PS_READABLE))
 			return "";
 

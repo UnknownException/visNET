@@ -55,7 +55,7 @@ namespace UnitTest
 			for (uint32_t i = 0; i < 4096 * 8; ++i)
 			{
 				visNET::Packet packet;
-				packet.writeUInt(i % 913);
+				packet.writeUInt32(i % 913);
 
 				tcpCl.send(packet);
 			}
@@ -94,7 +94,7 @@ namespace UnitTest
 				}
 
 				for (auto it = recv.begin(); it != recv.end(); ++it)
-					received.push_back((*it).getPacket()->readUInt());
+					received.push_back((*it).getPacket()->readUInt32());
 
 				/* Reset attempts */
 				nAttempts = 50;
@@ -138,7 +138,7 @@ namespace UnitTest
 			for (uint32_t i = 0; i < 4096 * 8; ++i)
 			{
 				visNET::Packet packet;
-				packet.writeUInt(i % 844);
+				packet.writeUInt32(i % 844);
 
 				tcpSvr.send(connectionId, packet);
 			}
@@ -162,7 +162,7 @@ namespace UnitTest
 				}
 
 				for (auto it = recv.begin(); it != recv.end(); ++it)
-					received.push_back((*it).getPacket()->readUInt());
+					received.push_back((*it).getPacket()->readUInt32());
 
 				/* Reset attempts */
 				nAttempts = 50;
@@ -213,7 +213,7 @@ namespace UnitTest
 			{
 				visNET::Packet packet;
 				for (uint32_t x = 0; x < packetSizeLimit; ++x)
-					packet.writeUChar(x % 256);
+					packet.writeUInt8(x % 256);
 
 				tcpCl.send(packet);
 			}
@@ -237,7 +237,7 @@ namespace UnitTest
 				{
 					std::vector<uint8_t> params;
 					for(uint32_t x = 0; x < packetSizeLimit; ++x)
-						params.push_back((*it).getPacket()->readUChar());
+						params.push_back((*it).getPacket()->readUInt8());
 
 					received.push_back(params);
 					Assert::AreEqual((size_t)packetSizeLimit, params.size(), L"Received different amount of parameters than expected", LINE_INFO());
@@ -296,7 +296,7 @@ namespace UnitTest
 			{
 				visNET::Packet packet;
 				for (uint32_t x = 0; x < packetSizeLimit; ++x)
-					packet.writeUChar(x % 256);
+					packet.writeUInt8(x % 256);
 
 				tcpSvr.send(connectionId, packet);
 			}
@@ -320,7 +320,7 @@ namespace UnitTest
 				{
 					std::vector<uint8_t> params;
 					for (uint32_t x = 0; x < packetSizeLimit; ++x)
-						params.push_back((*it).getPacket()->readUChar());
+						params.push_back((*it).getPacket()->readUInt8());
 
 					received.push_back(params);
 					Assert::AreEqual((size_t)packetSizeLimit, params.size(), L"Received different amount of parameters than expected", LINE_INFO());
