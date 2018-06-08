@@ -31,6 +31,9 @@ namespace visNET{
 
 		memcpy(m_pData + m_nSize, pData, nLength);
 		m_nSize += nLength;
+
+		if (m_nSize > _visNET_PACKETSIZE_LIMIT)
+			setState(PS_INVALID);
 	}
 
 	void Packet::writeString(const char* str)
