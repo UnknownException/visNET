@@ -302,7 +302,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TestBlobArray.cpp" />
     <ClCompile Include="TestPacket.cpp" />
     <ClCompile Include="TestTcp.cpp" />
     <ClCompile Include="TestUdp.cpp" />

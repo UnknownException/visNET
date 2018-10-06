@@ -28,10 +28,10 @@ namespace UnitTest
 			Assert::IsTrue(udpClient1.send("127.0.0.1", TESTUDP_PORT5, packet));
 
 			/* Get received packet size from invalid peer */
-			Assert::AreEqual(static_cast<size_t>(0), udpClient4.getPackets().size(), L"Invalid peer 4 received a packet", LINE_INFO());
+			Assert::AreEqual(static_cast<size_t>(0), udpClient4.receive().size(), L"Invalid peer 4 received a packet", LINE_INFO());
 
 			/* Get received packet size from valid peer */
-			Assert::AreEqual(static_cast<size_t>(1), udpClient3.getPackets().size(), L"Valid peer 3 didn't receive a packet", LINE_INFO());
+			Assert::AreEqual(static_cast<size_t>(1), udpClient3.receive().size(), L"Valid peer 3 didn't receive a packet", LINE_INFO());
 
 			/* Send to peer udpClient1 from peer udpClient2 */
 			visNET::Packet packet3;
@@ -42,10 +42,10 @@ namespace UnitTest
 			Assert::IsTrue(udpClient3.send("127.0.0.1", TESTUDP_PORT4, packet));
 
 			/* Get received packet size from valid peer */
-			Assert::AreEqual(static_cast<size_t>(1), udpClient1.getPackets().size(), L"Valid peer 1 didn't receive a packet", LINE_INFO());
+			Assert::AreEqual(static_cast<size_t>(1), udpClient1.receive().size(), L"Valid peer 1 didn't receive a packet", LINE_INFO());
 
 			/* Get received packet size from valid peer */
-			Assert::AreEqual(static_cast<size_t>(1), udpClient2.getPackets().size(), L"Valid peer 2 didn't receive a packet", LINE_INFO());
+			Assert::AreEqual(static_cast<size_t>(1), udpClient2.receive().size(), L"Valid peer 2 didn't receive a packet", LINE_INFO());
 
 			/* Shutdown Winsock */
 			Assert::IsTrue(visNET::cleanup(), L"Failed to cleanup", LINE_INFO());
@@ -66,10 +66,10 @@ namespace UnitTest
 			int32_t nAttempts = 50;
 
 			/* Receive Packet */
-			auto recv = udpClient2.getPackets();
+			auto recv = udpClient2.receive();
 			while (recv.empty())
 			{
-				recv = udpClient2.getPackets();
+				recv = udpClient2.receive();
 
 				// Halt Execution
 				Sleep(10);

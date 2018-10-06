@@ -5,10 +5,9 @@ VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visNET", "source\visNET.vcxproj", "{24971A48-3C4D-43B0-8222-92C1C34BE841}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visNET.Test", "tests\source\visNET.Test\visNET.Test.vcxproj", "{949148C7-1E90-4E63-8A52-12BB55219C25}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "tests\UnitTest\UnitTest.vcxproj", "{D522DC88-6E29-4677-9EB1-1E6E6785460F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{24971A48-3C4D-43B0-8222-92C1C34BE841} = {24971A48-3C4D-43B0-8222-92C1C34BE841}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +37,18 @@ Global
 		{24971A48-3C4D-43B0-8222-92C1C34BE841}.Release|Win32.Build.0 = Release|Win32
 		{24971A48-3C4D-43B0-8222-92C1C34BE841}.Release|x64.ActiveCfg = Release|x64
 		{24971A48-3C4D-43B0-8222-92C1C34BE841}.Release|x64.Build.0 = Release|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug|Win32.ActiveCfg = Debug|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug|Win32.Build.0 = Debug|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug|x64.ActiveCfg = Debug|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Debug|x64.Build.0 = Debug|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release Dynamic|Win32.ActiveCfg = Release Dynamic|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release Dynamic|x64.ActiveCfg = Release Dynamic|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release|Win32.ActiveCfg = Release|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release|Win32.Build.0 = Release|Win32
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release|x64.ActiveCfg = Release|x64
+		{949148C7-1E90-4E63-8A52-12BB55219C25}.Release|x64.Build.0 = Release|x64
 		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{D522DC88-6E29-4677-9EB1-1E6E6785460F}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64

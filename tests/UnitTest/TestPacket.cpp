@@ -94,10 +94,10 @@ namespace UnitTest
 			nAttempts = 50;
 
 			/* Receive Packet */
-			auto recv = tcpSvr.getPackets();
+			auto recv = tcpSvr.receive();
 			while (recv.empty())
 			{
-				recv = tcpSvr.getPackets();
+				recv = tcpSvr.receive();
 
 				// Halt Execution
 				Sleep(10);
@@ -127,7 +127,7 @@ namespace UnitTest
 				Assert::Fail(L"Failed to read uint64 from packet", LINE_INFO());
 
 			auto recvBlob = pPacket->readBlobArray<int32_t>();
-			Assert::AreEqual(static_cast<uint32_t>(3), recvBlob->getBlobCount(), L"Incorrect blob count", LINE_INFO());
+			Assert::AreEqual(static_cast<uint32_t>(3), recvBlob->getItemCount(), L"Incorrect blob count", LINE_INFO());
 			Assert::AreEqual(1, *recvBlob->get(0), L"Blob value 1 is incorrect", LINE_INFO());
 			Assert::AreEqual(33, *recvBlob->get(1), L"Blob value 2 is incorrect", LINE_INFO());
 			Assert::AreEqual(34, *recvBlob->get(2), L"Blob value 3 is incorrect", LINE_INFO());
@@ -179,10 +179,10 @@ namespace UnitTest
 			int32_t nAttempts = 50;
 
 			/* Receive Packet */
-			auto recv = udpClient2.getPackets();
+			auto recv = udpClient2.receive();
 			while (recv.empty())
 			{
-				recv = udpClient2.getPackets();
+				recv = udpClient2.receive();
 
 				// Halt Execution
 				Sleep(10);
@@ -212,7 +212,7 @@ namespace UnitTest
 				Assert::Fail(L"Failed to read uint64 from packet", LINE_INFO());
 
 			auto recvBlob = pPacket->readBlobArray<int32_t>();
-			Assert::AreEqual(static_cast<uint32_t>(3), recvBlob->getBlobCount(), L"Incorrect blob count", LINE_INFO());
+			Assert::AreEqual(static_cast<uint32_t>(3), recvBlob->getItemCount(), L"Incorrect blob count", LINE_INFO());
 			Assert::AreEqual(1, *recvBlob->get(0), L"Blob value 1 is incorrect", LINE_INFO());
 			Assert::AreEqual(33, *recvBlob->get(1), L"Blob value 2 is incorrect", LINE_INFO());
 			Assert::AreEqual(34, *recvBlob->get(2), L"Blob value 3 is incorrect", LINE_INFO());

@@ -82,10 +82,10 @@ namespace UnitTest
 			std::vector<uint32_t> received;
 			while (received.size() < 4096 * 8)
 			{
-				auto recv = tcpSvr.getPackets();
+				auto recv = tcpSvr.receive();
 				while (recv.empty())
 				{
-					recv = tcpSvr.getPackets();
+					recv = tcpSvr.receive();
 
 					// Halt Execution
 					Sleep(10);
@@ -150,10 +150,10 @@ namespace UnitTest
 			std::vector<uint32_t> received;
 			while (received.size() < 4096 * 8)
 			{
-				auto recv = tcpCl.getPackets();
+				auto recv = tcpCl.receive();
 				while (recv.empty())
 				{
-					recv = tcpCl.getPackets();
+					recv = tcpCl.receive();
 
 					// Halt Execution
 					Sleep(10);
@@ -222,10 +222,10 @@ namespace UnitTest
 			std::vector<std::vector<uint8_t>> received;
 			while (received.size() < packetsToSend)
 			{
-				auto recv = tcpSvr.getPackets();
+				auto recv = tcpSvr.receive();
 				while (recv.empty())
 				{
-					recv = tcpSvr.getPackets();
+					recv = tcpSvr.receive();
 
 					// Halt Execution
 					Sleep(10);
@@ -305,10 +305,10 @@ namespace UnitTest
 			std::vector<std::vector<uint8_t>> received;
 			while (received.size() < packetsToSend)
 			{
-				auto recv = tcpCl.getPackets();
+				auto recv = tcpCl.receive();
 				while (recv.empty())
 				{
-					recv = tcpCl.getPackets();
+					recv = tcpCl.receive();
 
 					// Halt Execution
 					Sleep(10);
@@ -377,10 +377,10 @@ namespace UnitTest
 			nAttempts = 5000;
 
 			/* Receive Packet */
-			auto recv = tcpSvr.getPackets();
+			auto recv = tcpSvr.receive();
 			while (recv.empty())
 			{
-				recv = tcpSvr.getPackets();
+				recv = tcpSvr.receive();
 				nAttempts--;
 				Assert::AreNotEqual(0, nAttempts, L"Failed to receive a data packet", LINE_INFO());
 			}
