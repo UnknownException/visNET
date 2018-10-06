@@ -196,8 +196,10 @@ namespace visNET{
 			copy->m_pData = nullptr;
 			copy->m_nSize = 0;
 		}
+		
 		copy->write(m_pData, m_nSize);
-
+		copy->m_eState = m_eState;
+		
 		return copy;
 	}
 }
