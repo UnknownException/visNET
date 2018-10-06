@@ -17,7 +17,7 @@ namespace visNET{
 		void send(TcpMessage& message);
 		void send(ConnectionIdentifier identifier, Packet& packet);
 
-		std::vector<TcpMessage> getPackets();
+		std::vector<TcpMessage> receive();
 		std::vector<ConnectionIdentifier> getDisconnected();
 		void disconnect(ConnectionIdentifier nClId);
 	};

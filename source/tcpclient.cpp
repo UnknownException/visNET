@@ -79,7 +79,7 @@ namespace visNET{
 		send(packet._copy());
 	}
 
-	std::vector<TcpMessage> TcpClient::getPackets()
+	std::vector<TcpMessage> TcpClient::receive()
 	{
 		if (!isValid())
 			return std::vector<TcpMessage>();

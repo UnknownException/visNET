@@ -64,7 +64,7 @@ namespace visNET{
 		return send(UdpMessage(ip, port, packet._copy()));
 	}
 
-	std::vector<UdpMessage> UdpClient::getPackets()
+	std::vector<UdpMessage> UdpClient::receive()
 	{
 		if (!isValid())
 			return std::vector<UdpMessage>();

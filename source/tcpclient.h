@@ -22,8 +22,7 @@ namespace visNET{
 
 		void send(std::shared_ptr<Packet> pPacket);
 		void send(Packet& pPacket);
-
-		std::vector<TcpMessage> getPackets();
+		std::vector<TcpMessage> receive();
 		bool isDisconnected();
 	};
 }

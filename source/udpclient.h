@@ -11,7 +11,7 @@ namespace visNET{
 		bool send(UdpMessage& message);
 		bool send(std::string ip, uint16_t port, Packet& packet);
 
-		std::vector<UdpMessage> getPackets();
+		std::vector<UdpMessage> receive();
 	private:
 		bool validatePacket(uint8_t* buffer, uint32_t bufferSize, uint32_t expectedPacketSize);
 		uint32_t generateChecksum(const uint8_t* buffer, const uint32_t bufferSize);
