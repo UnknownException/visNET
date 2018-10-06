@@ -50,10 +50,10 @@ namespace visNET{
 			if (!isState(PS_WRITABLE))
 				return;
 
-			writeUInt32(blob.getBlobCount());
+			writeUInt32(blob.getItemCount());
 
-			if (blob.getBlobCount() > 0)
-				write(blob.get(0), blob.getArraySize());
+			if (blob.getItemCount() > 0)
+				write(blob.get(0), blob.getSize());
 		}
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
@@ -142,27 +142,27 @@ namespace visNET{
 			if (!isState(PS_READABLE))
 				return blob;
 
-			if (!m_pData || blob->getBlobCount() != 0) // Can't read without data or in an already filled blob
+			if (!m_pData || blob->getItemCount() != 0) // Can't read without data or in an already filled blob
 			{
 				setState(PS_INVALID);
 				return blob;
 			}
 
-			uint32_t nBlobCount = readUInt32();
+			uint32_t nItemCount = readUInt32();
 			if (!isState(PS_READABLE))
 				return blob;
 
 			// Can't read more data than the packet buffer contains
-			if (m_nCursor + (nBlobCount * blob->getBlobSize()) > m_nSize)
+			if (m_nCursor + (nItemCount * blob->getItemSize()) > m_nSize)
 			{
 				setState(PS_INVALID);
 				return blob;
 			}
 
-			if (nBlobCount > 0)
-				blob->add((T*)(m_pData + m_nCursor), nBlobCount);
+			if (nItemCount > 0)
+				blob->add((T*)(m_pData + m_nCursor), nItemCount);
 
-			m_nCursor += nBlobCount * blob->getBlobSize();
+			m_nCursor += nItemCount * blob->getItemSize();
 
 			return blob;
 		}
