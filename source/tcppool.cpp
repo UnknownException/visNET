@@ -7,7 +7,7 @@ namespace visNET{
 		m_bPacketsAvailable = false;
 		m_bRun = true;
 
-		m_currentIdentifier.increase(); // Start at 1
+		m_currentIdentifier = m_currentIdentifier.increase(); // Start at 1
 
 		m_pBuffer = new uint8_t[_visNET_NETWORKBUFFER_SIZE];
 
@@ -33,7 +33,7 @@ namespace visNET{
 			if (m_queReserveID.empty())
 			{
 				freeIdentifier = m_currentIdentifier;
-				m_currentIdentifier.increase();
+				m_currentIdentifier = m_currentIdentifier.increase();
 			}
 			else
 			{

@@ -17,8 +17,8 @@ namespace visNET {
 
 		}
 
-		void increase() {
-			++m_id;
+		ConnectionIdentifier increase() {
+			return ConnectionIdentifier(m_id + 1);
 		}
 
 		bool isValid() {
