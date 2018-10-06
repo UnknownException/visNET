@@ -17,13 +17,25 @@
     <ClCompile Include="blobarrayTest.cpp">
       <Filter>Structure</Filter>
     </ClCompile>
+    <ClCompile Include="packetTest.cpp">
+      <Filter>Packet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="packetbuilder.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Structure">
       <UniqueIdentifier>{48262cb3-dea9-49c7-b60f-3250cf484330}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packet">
+      <UniqueIdentifier>{4fad58ca-5992-4d51-b03b-8605beed5b5a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
