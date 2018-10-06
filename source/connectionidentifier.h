@@ -25,6 +25,10 @@ namespace visNET {
 			return m_id != 0;
 		}
 
+		decltype(m_id) getValue() {
+			return m_id;
+		}
+
 		bool operator==(const ConnectionIdentifier& second)
 		{
 			return m_id == second.m_id;
