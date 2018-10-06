@@ -89,7 +89,10 @@ namespace visNET{
 
 		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
 		if (!read(pBuffer, nLen))
+		{
+			delete[] pBuffer;
 			return "";
+		}
 
 		pBuffer[nLen] = 0;
 
