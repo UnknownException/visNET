@@ -17,7 +17,7 @@ TEST(Packet_Packet, EmptyReceivedPacketShouldBeValid)
 	// Assign
 	// Act
 	auto packet = PacketBuilder()
-					.build();
+		.build();
 
 	// Assert
 	EXPECT_TRUE(packet->isReadable());
@@ -44,8 +44,8 @@ TEST(Packet_Packet, ReadFromPacket)
 
 	// Assign
 	auto packet = PacketBuilder()
-					.writeInt32(testValue)
-					.build();
+		.writeInt32(testValue)
+		.build();
 
 	// Act
 	int32_t result = packet->readInt32();
@@ -60,8 +60,8 @@ TEST(Packet_Packet, ShouldNotReadOutsideOfPacketBounds)
 {
 	// Assign
 	auto packet = PacketBuilder()
-					.writeInt32(123)
-					.build();
+		.writeInt32(123)
+		.build();
 
 	// Act
 	int64_t result = packet->readInt64();
@@ -104,4 +104,17 @@ TEST(Packet_Packet, ShouldNotWriteMoreThanMaxLength)
 	// Assert
 	EXPECT_FALSE(packet.isWritable());
 	EXPECT_FALSE(packet.isValid());
+}
+
+TEST(Packet_Packet, IncompletePacketShouldBeInTransfering)
+{
+	// Assign
+	// Act
+	auto packet = PacketBuilder()
+		.writeInt32(123)
+		.buildIncomplete();
+
+	// Assert
+	EXPECT_TRUE(packet->isTransfering());
+	EXPECT_TRUE(packet->isValid());
 }

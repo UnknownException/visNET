@@ -47,4 +47,14 @@ public:
 		packet->_onReceive(&m_vData[0], m_vData.size());
 		return packet;
 	}
+
+	std::shared_ptr<visNET::Packet> buildIncomplete() {
+		std::shared_ptr<visNET::Packet> packet = std::make_shared<visNET::Packet>();
+
+		uint32_t packetSize = m_vData.size() + 4;
+		memcpy(&m_vData[0], &packetSize, sizeof(uint32_t));
+
+		packet->_onReceive(&m_vData[0], m_vData.size());
+		return packet;
+	}
 };
