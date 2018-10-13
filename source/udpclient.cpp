@@ -4,45 +4,22 @@
 namespace visNET{
 	UdpClient::UdpClient(uint16_t nPort)
 	{
+		m_bValid = false;
+
 		// Reserve buffer for one full packet and checksum
 		m_pBuffer = new uint8_t[_visNET_PACKETSIZE_LIMIT + sizeof(uint32_t)];
-
-		addrinfo hints, *result;
-		ZeroMemory(&hints, sizeof(addrinfo));
-		hints.ai_family = AF_INET;
-		hints.ai_flags = AI_PASSIVE;
-		hints.ai_socktype = SOCK_DGRAM;
-		hints.ai_protocol = IPPROTO_UDP;
-
-		result = &hints;
-	
-		SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-		if (s == INVALID_SOCKET)
-		{
-			setError("Failed to create a socket");
+		m_pSocket = new UdpSocket();
+		if (!m_pSocket->bindToPort(nPort))
 			return;
-		}
 
-		sockaddr_in addr;
-		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = INADDR_ANY;
-		addr.sin_port = htons(nPort);
-
-		if (bind(s, reinterpret_cast<sockaddr*>(&addr), sizeof(sockaddr_in)) < 0)
-		{
-			setError("Failed to bind to the socket");
-			return;
-		}
-
-		getSocket()->setHandle(s);
-		getSocket()->setNonBlocking(true);
-
-		setValid();
+		m_pSocket->setNonBlocking(true);
+		m_bValid = true;
 	}
 
 	UdpClient::~UdpClient()
 	{
 		delete[] m_pBuffer;
+		delete m_pSocket;
 	}
 
 	bool UdpClient::send(UdpMessage& message) 
@@ -56,7 +33,7 @@ namespace visNET{
 		memcpy(m_pBuffer, &checksum, sizeof(uint32_t));
 			
 		memcpy(m_pBuffer + sizeof(uint32_t), message.getPacket()->_getRawData(), message.getPacket()->_getRawSize());
-		return getSocket()->writeTo(m_pBuffer, message.getPacket()->_getRawSize() + sizeof(uint32_t), message.getIP().c_str(), message.getPort());
+		return m_pSocket->write(m_pBuffer, message.getPacket()->_getRawSize() + sizeof(uint32_t), message.getIP().c_str(), message.getPort());
 	}
 
 	bool UdpClient::send(std::string ip, uint16_t port, Packet& packet)
@@ -71,7 +48,7 @@ namespace visNET{
 
 		std::vector<UdpMessage> retn;
 
-		auto result = getSocket()->readFrom(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
+		auto result = m_pSocket->read(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
 		while (result.second > 0)
 		{
 			// Check if packet atleast contains checksum and packetsize
@@ -93,7 +70,7 @@ namespace visNET{
 				}
 			}
 
-			result = getSocket()->readFrom(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
+			result = m_pSocket->read(m_pBuffer, _visNET_PACKETSIZE_LIMIT);
 		}
 
 		return retn;

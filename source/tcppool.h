@@ -5,8 +5,6 @@
 #include <atomic>
 #include <mutex>
 
-#include "identifiablesocket.h"
-
 /*
 	Manages TCP input and output stream
 	Converts reveived chunks back into complete packets
@@ -47,7 +45,7 @@ namespace visNET{
 	private:
 		ConnectionIdentifier generateIdentifier();
 	public:
-		ConnectionIdentifier addSocket(std::shared_ptr<Socket> s);
+		ConnectionIdentifier addSocket(std::shared_ptr<TcpSocket> s);
 		void removeSocket(ConnectionIdentifier id);
 		std::vector<ConnectionIdentifier> getDisconnected();
 		void SetKeepHistory(bool b) { m_bKeepHistory = b; }

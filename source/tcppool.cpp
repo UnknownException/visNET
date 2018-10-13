@@ -46,7 +46,7 @@ namespace visNET{
 		return freeIdentifier;
 	}
 
-	ConnectionIdentifier TcpPool::addSocket(std::shared_ptr<Socket> s)
+	ConnectionIdentifier TcpPool::addSocket(std::shared_ptr<TcpSocket> s)
 	{
 		auto identifier = generateIdentifier();
 

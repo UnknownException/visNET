@@ -1,6 +1,4 @@
 #include "pch.h"
-#include <WinSock2.h>
-#include "../../../source/socket.h"
 #include "../../../source/identifiablesocket.h"
 
 TEST(Structure_IdentifiableSocket, CreateIdentifiableSocket)

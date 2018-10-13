@@ -13,11 +13,14 @@
     <Filter Include="Helper">
       <UniqueIdentifier>{9f8024d8-9740-4c95-9120-fb06435f0539}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\TCP">
+      <UniqueIdentifier>{98d95aec-b9be-4d29-a86f-8f12800e1603}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\UDP">
+      <UniqueIdentifier>{ba8635ee-b9cf-4dc4-8790-bad489b8d1be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="socket.h">
-      <Filter>Network</Filter>
-    </ClInclude>
     <ClInclude Include="blobarray.h">
       <Filter>Structure</Filter>
     </ClInclude>
@@ -26,18 +29,6 @@
     </ClInclude>
     <ClInclude Include="tcppool.h">
       <Filter>Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="networkobject.h">
-      <Filter>Network</Filter>
-    </ClInclude>
-    <ClInclude Include="tcplistener.h">
-      <Filter>Network</Filter>
-    </ClInclude>
-    <ClInclude Include="tcpclient.h">
-      <Filter>Network</Filter>
-    </ClInclude>
-    <ClInclude Include="udpclient.h">
-      <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="visnet.h" />
     <ClInclude Include="udpmessage.h">
@@ -52,29 +43,47 @@
     <ClInclude Include="identifiablesocket.h">
       <Filter>Structure</Filter>
     </ClInclude>
+    <ClInclude Include="isocket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="tcpclient.h">
+      <Filter>Network\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="tcplistener.h">
+      <Filter>Network\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="udpclient.h">
+      <Filter>Network\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="udpsocket.h">
+      <Filter>Network\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="tcpsocket.h">
+      <Filter>Network\TCP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="socket.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
     <ClCompile Include="packet.cpp">
       <Filter>Packet</Filter>
-    </ClCompile>
-    <ClCompile Include="tcplistener.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
-    <ClCompile Include="tcpclient.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
-    <ClCompile Include="udpclient.cpp">
-      <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="tcppool.cpp">
       <Filter>Helper</Filter>
     </ClCompile>
     <ClCompile Include="visnet.cpp" />
-    <ClCompile Include="networkobject.cpp">
-      <Filter>Network</Filter>
+    <ClCompile Include="tcpclient.cpp">
+      <Filter>Network\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="tcplistener.cpp">
+      <Filter>Network\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="udpclient.cpp">
+      <Filter>Network\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="udpsocket.cpp">
+      <Filter>Network\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="tcpsocket.cpp">
+      <Filter>Network\TCP</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

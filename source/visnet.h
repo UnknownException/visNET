@@ -22,16 +22,29 @@
 #include "blobarray.h"
 #include "connectionidentifier.h"
 #include "packet.h"
-#include "tcpmessage.h"
-#include "udpmessage.h"
 
 #ifdef _BUILDLIBRARY
-#include "socket.h"
-#include "tcppool.h"
+	#include "isocket.h"
 #endif
 
+#include "tcpmessage.h"
+#ifdef _BUILDLIBRARY
+	#include "tcpsocket.h"
+	#include "identifiablesocket.h"
+	#include "tcppool.h"
+#else
+	typedef void TcpPool;
+	typedef void TcpSocket;
+#endif
 #include "tcplistener.h"
 #include "tcpclient.h"
+
+#include "udpmessage.h"
+#ifdef _BUILDLIBRARY
+	#include "udpsocket.h"
+#else
+	typedef void UdpSocket;
+#endif
 #include "udpclient.h"
 
 namespace visNET{

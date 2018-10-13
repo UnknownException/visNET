@@ -1,13 +1,10 @@
 #pragma once
-#include "networkobject.h"
 
 namespace visNET{
-	class __declspec(dllexport) TcpListener : public NetworkObject{
-#ifdef _BUILDLIBRARY
+	class __declspec(dllexport) TcpListener {
+		TcpSocket* m_pSocket;
 		TcpPool* m_pTcpPool;
-#else
-		void* m_pTcpPool;
-#endif
+		bool m_bValid;
 	public:
 		TcpListener(uint16_t nPort);
 		virtual ~TcpListener();
@@ -20,5 +17,6 @@ namespace visNET{
 		std::vector<TcpMessage> receive();
 		std::vector<ConnectionIdentifier> getDisconnected();
 		void disconnect(ConnectionIdentifier nClId);
+		bool isValid() { return m_bValid; }
 	};
 }

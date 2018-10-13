@@ -4,9 +4,9 @@ namespace visNET{
 	class IdentifiableSocket {
 	private:
 		ConnectionIdentifier m_socketIdentifier;
-		std::shared_ptr<Socket> m_socket;
+		std::shared_ptr<TcpSocket> m_socket;
 	public:
-		IdentifiableSocket(ConnectionIdentifier socketIdentifier, std::shared_ptr<Socket> socket) {
+		IdentifiableSocket(ConnectionIdentifier socketIdentifier, std::shared_ptr<TcpSocket> socket) {
 			m_socketIdentifier = socketIdentifier;
 			m_socket = socket;
 		}
@@ -16,6 +16,6 @@ namespace visNET{
 		}
 
 		ConnectionIdentifier getConnectionIdentifier() { return m_socketIdentifier; }
-		std::shared_ptr<Socket> getSocket() { return m_socket; }
+		std::shared_ptr<TcpSocket> getSocket() { return m_socket; }
 	};
 }

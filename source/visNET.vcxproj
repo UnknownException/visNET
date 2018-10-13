@@ -260,25 +260,26 @@
     <ClInclude Include="blobarray.h" />
     <ClInclude Include="connectionidentifier.h" />
     <ClInclude Include="identifiablesocket.h" />
+    <ClInclude Include="isocket.h" />
     <ClInclude Include="tcpclient.h" />
-    <ClInclude Include="networkobject.h" />
     <ClInclude Include="tcpmessage.h" />
     <ClInclude Include="tcppool.h" />
     <ClInclude Include="tcplistener.h" />
     <ClInclude Include="packet.h" />
-    <ClInclude Include="socket.h" />
+    <ClInclude Include="tcpsocket.h" />
     <ClInclude Include="udpclient.h" />
     <ClInclude Include="udpmessage.h" />
+    <ClInclude Include="udpsocket.h" />
     <ClInclude Include="visnet.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="networkobject.cpp" />
     <ClCompile Include="tcpclient.cpp" />
     <ClCompile Include="tcplistener.cpp" />
     <ClCompile Include="packet.cpp" />
-    <ClCompile Include="socket.cpp" />
     <ClCompile Include="tcppool.cpp" />
+    <ClCompile Include="tcpsocket.cpp" />
     <ClCompile Include="udpclient.cpp" />
+    <ClCompile Include="udpsocket.cpp" />
     <ClCompile Include="visnet.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

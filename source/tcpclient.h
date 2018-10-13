@@ -1,21 +1,15 @@
 #pragma once
 
-#include "networkobject.h"
-
 /*
 	Client is the client sided connection
 	This class will connect to a listener
 */
 
 namespace visNET{
-	class __declspec(dllexport) TcpClient : public NetworkObject{
-#ifdef _BUILDLIBRARY
+	class __declspec(dllexport) TcpClient {
 		TcpPool* m_pTcpPool;
-#else
-		void* m_pTcpPool;
-#endif
 		ConnectionIdentifier m_serverIdentifier;
-
+		bool m_bValid;
 	public:
 		TcpClient(const char* pszIp, uint16_t nPort);
 		virtual ~TcpClient();
@@ -24,5 +18,6 @@ namespace visNET{
 		void send(Packet& pPacket);
 		std::vector<TcpMessage> receive();
 		bool isDisconnected();
+		bool isValid() { return m_bValid; }
 	};
 }
