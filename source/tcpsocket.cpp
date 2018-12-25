@@ -1,6 +1,10 @@
 #include "visnet.h"
 #include "tcpsocket.h"
 
+#ifndef _WIN32
+	#include <fcntl.h>
+#endif
+
 namespace visNET {
 	TcpSocket::TcpSocket()
 	{
@@ -8,8 +12,13 @@ namespace visNET {
 
 	TcpSocket::~TcpSocket()
 	{
+#ifdef _WIN32
 		if(getHandle() != 0)
 			closesocket(getHandle());
+#else
+		if (getHandle() != 0)
+			close(getHandle());
+#endif
 	}
 
 	bool TcpSocket::listenOn(uint16_t nPort)
@@ -18,7 +27,8 @@ namespace visNET {
 			return false;
 
 		addrinfo hints, *result;
-		ZeroMemory(&hints, sizeof(addrinfo));
+		memset(&hints, 0, sizeof(addrinfo));
+
 		hints.ai_family = AF_INET;
 		hints.ai_flags = AI_PASSIVE;
 		hints.ai_socktype = SOCK_STREAM;
@@ -59,7 +69,8 @@ namespace visNET {
 			return false;
 
 		addrinfo hints, *result;
-		ZeroMemory(&hints, sizeof(addrinfo));
+		memset(&hints, 0, sizeof(addrinfo));
+
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
@@ -83,7 +94,11 @@ namespace visNET {
 				break;
 			}
 
+#ifdef _WIN32
 			closesocket(s);
+#else
+			close(s);
+#endif
 		}
 
 		freeaddrinfo(result);
@@ -99,12 +114,21 @@ namespace visNET {
 		if (getHandle() == 0)
 			return false;
 
+#ifdef _WIN32
 		u_long nVal = b ? 1 : 0;
 
 		if (ioctlsocket(getHandle(), FIONBIO, &nVal) != 0)
 			return false;
 
 		return true;
+#else
+		int32_t nFlags = fcntl(fd_ F_GETFL, 0);
+		if (nFlags == -1)
+			return false;
+
+		nFlags = b ? nFlags | O_NONLOCK : nFlags & ~O_NONBLOCK;
+		return fcntl(fd, F_SETFL, nFlags) == 0 ? true : false;
+#endif
 	}
 
 	bool TcpSocket::write(const uint8_t* pBuffer, int32_t nSize)

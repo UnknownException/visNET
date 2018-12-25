@@ -6,12 +6,14 @@
 
 #ifdef _BUILDLIBRARY
 	#ifdef _WIN32
-	#include <WinSock2.h>
-	#include <WS2tcpip.h>
+		#include <WinSock2.h>
+		#include <WS2tcpip.h>
 
-	#pragma comment(lib, "ws2_32.lib")
+		#pragma comment(lib, "ws2_32.lib")
 	#else
-	//Linux libs...
+		// Linux
+		#define SOCKET_ERROR -1
+		#define INVALID_SOCKET -1
 	#endif
 #endif
 

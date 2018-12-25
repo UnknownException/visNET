@@ -38,7 +38,8 @@ namespace visNET{
 
 	bool UdpClient::send(std::string ip, uint16_t port, Packet& packet)
 	{
-		return send(UdpMessage(ip, port, packet._copy()));
+		UdpMessage message(ip, port, packet._copy());
+		return send(message);
 	}
 
 	std::vector<UdpMessage> UdpClient::receive()
@@ -65,7 +66,9 @@ namespace visNET{
 						char tmp[INET_ADDRSTRLEN];
 						InetNtop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
 
-						retn.push_back(UdpMessage(std::string(tmp), result.first.sin_port, packet));
+						std::string address(tmp);
+						UdpMessage message(address, result.first.sin_port, packet);
+						retn.push_back(message);
 					}
 				}
 			}
