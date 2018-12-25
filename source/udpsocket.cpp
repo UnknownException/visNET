@@ -3,6 +3,7 @@
 
 #ifndef _WIN32
 	#include <fcntl.h>
+	#include <arpa/inet.h>
 #endif
 
 namespace visNET {
@@ -82,9 +83,15 @@ namespace visNET {
 		targetAddr.sin_family = AF_INET;
 		targetAddr.sin_port = htons(nPort);
 
+#ifdef _WIN32
 		InetPton(AF_INET, szIP, &targetAddr.sin_addr);
 
 		int32_t nRes = sendto(getHandle(), reinterpret_cast<const char*>(pBuffer), nSize, 0, (SOCKADDR*)&targetAddr, sizeof(targetAddr));
+#else
+		inet_pton(AF_INET, szIP, &targetAddr.sin_addr);
+
+		int32_t nRes = sendto(getHandle(), reinterpret_cast<const char*>(pBuffer), nSize, 0, (__CONST_SOCKADDR_ARG)&targetAddr, sizeof(targetAddr));
+#endif
 		if (nRes == SOCKET_ERROR)
 			setAlive(false);
 
