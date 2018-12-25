@@ -12,6 +12,9 @@
 		#pragma comment(lib, "ws2_32.lib")
 	#else
 		// Linux
+		#include <cstring>
+		#include <netinet/in.h>
+
 		#define SOCKET_ERROR -1
 		#define INVALID_SOCKET -1
 	#endif

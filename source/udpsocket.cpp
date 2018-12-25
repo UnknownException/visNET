@@ -2,7 +2,10 @@
 #include "udpsocket.h"
 
 #ifndef _WIN32
+	#include <unistd.h>
 	#include <fcntl.h>
+	#include <netdb.h>
+
 	#include <arpa/inet.h>
 #endif
 
@@ -65,12 +68,12 @@ namespace visNET {
 
 		return true;
 #else
-		int32_t nFlags = fcntl(fd_ F_GETFL, 0);
+		int32_t nFlags = fcntl(getHandle(), F_GETFL, 0);
 		if (nFlags == -1)
 			return false;
 
-		nFlags = b ? nFlags | O_NONLOCK : nFlags & ~O_NONBLOCK;
-		return fcntl(fd, F_SETFL, nFlags) == 0 ? true : false;
+		nFlags = b ? nFlags | O_NONBLOCK : nFlags & ~O_NONBLOCK;
+		return fcntl(getHandle(), F_SETFL, nFlags) == 0 ? true : false;
 #endif
 	}
 
@@ -108,7 +111,11 @@ namespace visNET {
 
 		int32_t nSenderAddrSize = sizeof(senderAddr);
 
+#ifdef _WIN32
 		int nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (SOCKADDR*)&senderAddr, &nSenderAddrSize);
+#else
+		int nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (__SOCKADDR_ARG)&senderAddr, &nSenderAddrSize);
+#endif
 
 		return std::make_pair(senderAddr, nRes);
 	}

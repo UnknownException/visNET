@@ -2,7 +2,9 @@
 #include "tcpsocket.h"
 
 #ifndef _WIN32
+	#include <unistd.h>
 	#include <fcntl.h>
+	#include <netdb.h>
 #endif
 
 namespace visNET {
@@ -35,12 +37,12 @@ namespace visNET {
 		hints.ai_protocol = IPPROTO_TCP;
 
 		char szBuff[8];
-		sprintf_s(szBuff, sizeof(szBuff), "%i", nPort);
+		snprintf(szBuff, sizeof(szBuff), "%i", nPort);
 
 		if (getaddrinfo(NULL, szBuff, &hints, &result) != 0)
 			return false;
 
-		SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+		auto s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 		if (s == INVALID_SOCKET)
 			return false;
 
@@ -76,7 +78,7 @@ namespace visNET {
 		hints.ai_protocol = IPPROTO_TCP;
 
 		char szBuff[8];
-		sprintf_s(szBuff, sizeof(szBuff), "%i", nPort);
+		snprintf(szBuff, sizeof(szBuff), "%i", nPort);
 
 		if (getaddrinfo(pszIp, szBuff, &hints, &result) != 0)
 			return false;
@@ -122,12 +124,12 @@ namespace visNET {
 
 		return true;
 #else
-		int32_t nFlags = fcntl(fd_ F_GETFL, 0);
+		int32_t nFlags = fcntl(getHandle(), F_GETFL, 0);
 		if (nFlags == -1)
 			return false;
 
-		nFlags = b ? nFlags | O_NONLOCK : nFlags & ~O_NONBLOCK;
-		return fcntl(fd, F_SETFL, nFlags) == 0 ? true : false;
+		nFlags = b ? nFlags | O_NONBLOCK : nFlags & ~O_NONBLOCK;
+		return fcntl(getHandle(), F_SETFL, nFlags) == 0 ? true : false;
 #endif
 	}
 

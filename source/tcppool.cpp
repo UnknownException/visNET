@@ -1,6 +1,10 @@
 #include "visnet.h"
 #include "tcppool.h"
 
+#ifndef _WIN32
+	#include <algorithm>
+#endif
+
 namespace visNET{
 	TcpPool::TcpPool()
 	{
@@ -151,11 +155,11 @@ namespace visNET{
 
 	void sleepFor(uint32_t duration)
 	{
-#ifndef _WIN32
-		std::this_thread::sleep_for(std::chrono::microseconds(duration));
-#else
-		if(!sleepForWin32(duration))
+#ifdef _WIN32
+		if (!sleepForWin32(duration))
 			std::this_thread::sleep_for(std::chrono::microseconds(duration));
+#else
+		std::this_thread::sleep_for(std::chrono::microseconds(duration));
 #endif
 	}
 
