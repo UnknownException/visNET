@@ -1,7 +1,7 @@
 #pragma once
 
 namespace visNET{
-	class __declspec(dllexport) TcpListener {
+	class DLLEXPORT TcpListener {
 		TcpSocket* m_pSocket;
 		TcpPool* m_pTcpPool;
 		bool m_bValid;

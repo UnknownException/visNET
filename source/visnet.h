@@ -20,6 +20,12 @@
 	#endif
 #endif
 
+#ifdef _WIN32
+	#define DLLEXPORT __declspec(dllexport)
+#else
+	#define DLLEXPORT
+#endif
+
 #define _visNET_PACKETSIZE_LIMIT 0xFFFF // Set packetsize limit to the maximum value of an unsigned short; packets bigger than this will be completely ignored
 #define _visNET_NETWORKBUFFER_SIZE 0x0FFF
 
@@ -53,6 +59,6 @@
 #include "udpclient.h"
 
 namespace visNET{
-	__declspec(dllexport) bool startup();
-	__declspec(dllexport) bool cleanup();
+	DLLEXPORT bool startup();
+	DLLEXPORT bool cleanup();
 }
