@@ -85,7 +85,7 @@ namespace visNET {
 
 		for (auto it = result; it != nullptr; it = it->ai_next)
 		{
-			SOCKET s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+			auto s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 			if (s == INVALID_SOCKET)
 				return false;
 

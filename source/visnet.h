@@ -11,8 +11,6 @@
 
 		#pragma comment(lib, "ws2_32.lib")
 	#else
-		// Linux
-		#include <cstring>
 		#include <netinet/in.h>
 
 		#define SOCKET_ERROR -1
@@ -23,7 +21,8 @@
 #ifdef _WIN32
 	#define DLLEXPORT __declspec(dllexport)
 #else
-	#define DLLEXPORT
+	#define DLLEXPORT __attribute__((visibility("default")))
+	#include <cstring>
 #endif
 
 #define _visNET_PACKETSIZE_LIMIT 0xFFFF // Set packetsize limit to the maximum value of an unsigned short; packets bigger than this will be completely ignored
