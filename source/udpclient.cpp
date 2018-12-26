@@ -1,6 +1,10 @@
 #include "visnet.h"
 #include "udpclient.h"
 
+#ifndef _WIN32
+	#include <arpa/inet.h>
+#endif
+
 namespace visNET{
 	UdpClient::UdpClient(uint16_t nPort)
 	{
@@ -38,7 +42,8 @@ namespace visNET{
 
 	bool UdpClient::send(std::string ip, uint16_t port, Packet& packet)
 	{
-		return send(UdpMessage(ip, port, packet._copy()));
+		UdpMessage message(ip, port, packet._copy());
+		return send(message);
 	}
 
 	std::vector<UdpMessage> UdpClient::receive()
@@ -63,9 +68,15 @@ namespace visNET{
 					if (packet->_onReceive(m_pBuffer + sizeof(uint32_t), size) == 0)
 					{
 						char tmp[INET_ADDRSTRLEN];
-						InetNtop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
 
-						retn.push_back(UdpMessage(std::string(tmp), result.first.sin_port, packet));
+#ifdef _WIN32
+						InetNtop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
+#else
+						inet_ntop(AF_INET, &result.first.sin_addr, tmp, INET_ADDRSTRLEN);
+#endif
+						std::string address(tmp);
+						UdpMessage message(address, result.first.sin_port, packet);
+						retn.push_back(message);
 					}
 				}
 			}

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace visNET{
-	class __declspec(dllexport) UdpClient {
+	class DLLEXPORT UdpClient {
 		UdpSocket* m_pSocket;
 		uint8_t* m_pBuffer;
 		bool m_bValid;

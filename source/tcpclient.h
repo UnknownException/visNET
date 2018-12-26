@@ -6,7 +6,7 @@
 */
 
 namespace visNET{
-	class __declspec(dllexport) TcpClient {
+	class DLLEXPORT TcpClient {
 		TcpPool* m_pTcpPool;
 		ConnectionIdentifier m_serverIdentifier;
 		bool m_bValid;

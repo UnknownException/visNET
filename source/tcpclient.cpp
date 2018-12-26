@@ -32,7 +32,8 @@ namespace visNET{
 		if (!isValid())
 			return; 
 		
-		m_pTcpPool->sendPacket(TcpMessage(m_serverIdentifier, pPacket));
+		TcpMessage message(m_serverIdentifier, pPacket);
+		m_pTcpPool->sendPacket(message);
 	}
 
 	void TcpClient::send(Packet& packet)

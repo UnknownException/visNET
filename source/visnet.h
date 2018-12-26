@@ -6,13 +6,23 @@
 
 #ifdef _BUILDLIBRARY
 	#ifdef _WIN32
-	#include <WinSock2.h>
-	#include <WS2tcpip.h>
+		#include <WinSock2.h>
+		#include <WS2tcpip.h>
 
-	#pragma comment(lib, "ws2_32.lib")
+		#pragma comment(lib, "ws2_32.lib")
 	#else
-	//Linux libs...
+		#include <netinet/in.h>
+
+		#define SOCKET_ERROR -1
+		#define INVALID_SOCKET -1
 	#endif
+#endif
+
+#ifdef _WIN32
+	#define DLLEXPORT __declspec(dllexport)
+#else
+	#define DLLEXPORT __attribute__((visibility("default")))
+	#include <cstring>
 #endif
 
 #define _visNET_PACKETSIZE_LIMIT 0xFFFF // Set packetsize limit to the maximum value of an unsigned short; packets bigger than this will be completely ignored
@@ -48,6 +58,6 @@
 #include "udpclient.h"
 
 namespace visNET{
-	__declspec(dllexport) bool startup();
-	__declspec(dllexport) bool cleanup();
+	DLLEXPORT bool startup();
+	DLLEXPORT bool cleanup();
 }

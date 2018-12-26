@@ -50,7 +50,8 @@ namespace visNET{
 
 	void TcpListener::send(ConnectionIdentifier identifier, Packet& packet)
 	{
-		send(TcpMessage(identifier, packet._copy()));
+		TcpMessage message(identifier, packet._copy());
+		send(message);
 	}
 	
 	std::vector<TcpMessage> TcpListener::receive() 
