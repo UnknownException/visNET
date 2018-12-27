@@ -11,7 +11,7 @@ void* extendsize(void* block, uint32_t size, uint32_t requested)
 	memset(ptr, 0, requested);
 
 	memcpy(ptr, block, size);
-	delete[] block;
+	delete[] static_cast<uint8_t*>(block);
 
 	return ptr;
 }

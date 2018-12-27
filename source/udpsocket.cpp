@@ -112,9 +112,9 @@ namespace visNET {
 		int32_t nSenderAddrSize = sizeof(senderAddr);
 
 #ifdef _WIN32
-		int nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (SOCKADDR*)&senderAddr, &nSenderAddrSize);
+		int32_t nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (SOCKADDR*)&senderAddr, &nSenderAddrSize);
 #else
-		int nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (__SOCKADDR_ARG)&senderAddr, (socklen_t*)&nSenderAddrSize);
+		int32_t nRes = recvfrom(getHandle(), reinterpret_cast<char*>(pBuffer), nSize, 0, (__SOCKADDR_ARG)&senderAddr, (socklen_t*)&nSenderAddrSize);
 #endif
 
 		return std::make_pair(senderAddr, nRes);
