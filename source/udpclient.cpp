@@ -57,7 +57,7 @@ namespace visNET{
 		while (result.second > 0)
 		{
 			// Check if packet atleast contains checksum and packetsize
-			if (result.second >= sizeof(uint32_t) + sizeof(uint32_t))
+			if (static_cast<size_t>(result.second) >= sizeof(uint32_t) + sizeof(uint32_t))
 			{
 				auto packet = std::make_shared<Packet>();
 				uint32_t size = 0;
