@@ -2,7 +2,7 @@
 
 namespace visNET {
 	class ISocket {
-		unsigned long long m_handle;
+		std::size_t m_handle;
 		bool m_bAlive;
 	public:
 		ISocket() { 
@@ -13,8 +13,8 @@ namespace visNET {
 		virtual ~ISocket() {
 		}
 
-		void setHandle(unsigned long long s) { m_handle = s; }
-		unsigned long long getHandle() { return m_handle; }
+		void setHandle(std::size_t s) { m_handle = s; }
+		std::size_t getHandle() { return m_handle; }
 
 		virtual bool setNonBlocking(bool b) = 0;
 

@@ -30,7 +30,7 @@ namespace visNET{
 			m_nItemCount = 0;
 
 #ifdef _visNET_STRICT_REALLOC
-			m_pData = new uint8_t[m_nBlobSize];
+			m_pData = new uint8_t[m_nItemSize];
 #else
 			m_nItemLimit = 10; // Initialize with 10 open slots
 			m_pData = new uint8_t[m_nItemSize * m_nItemLimit];
@@ -54,7 +54,7 @@ namespace visNET{
 		{
 #ifdef _visNET_STRICT_REALLOC
 			if (m_nItemCount != 0 || itemCount > 1)
-				m_pData = (uint8_t*)realloc(m_pData, (m_nItemCount + itemCount) * m_nItemSize);
+				m_pData = (uint8_t*)extendsize(m_pData, m_nItemCount * m_nItemSize, (m_nItemCount + itemCount) * m_nItemSize);
 #else
 			uint32_t difference = 0;
 			if (m_nItemCount + itemCount > m_nItemLimit)
@@ -62,10 +62,12 @@ namespace visNET{
 
 			if (difference > 0)
 			{
+				uint32_t oldLimit = m_nItemLimit;
+
 				m_nItemLimit = m_nItemCount + difference; // Make room for the additional blobs
 				m_nItemLimit = static_cast<uint32_t>((m_nItemLimit + 10) * _visNET_LOOSE_REALLOC); // Add 10 slots, and an additional percentage of the current slots
 
-				m_pData = static_cast<uint8_t*>(realloc(m_pData, m_nItemLimit * m_nItemSize));
+				m_pData = static_cast<uint8_t*>(extendsize(m_pData, oldLimit * m_nItemSize, m_nItemLimit * m_nItemSize));
 			}
 #endif
 
@@ -83,6 +85,22 @@ namespace visNET{
 		uint32_t getSize() { return m_nItemSize * m_nItemCount; }
 		uint32_t getItemSize() { return m_nItemSize; }
 		uint32_t getItemCount() { return m_nItemCount; }
+
+	private:
+		// Temporary fix
+		void* extendsize(void* block, uint32_t size, uint32_t requested)
+		{
+			if (requested < size)
+				return nullptr;
+
+			uint8_t* ptr = new uint8_t[requested];
+			memset(ptr, 0, requested);
+
+			memcpy(ptr, block, size);
+			delete[] block;
+
+			return ptr;
+		}
 	};
 }
 
