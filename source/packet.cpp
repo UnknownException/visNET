@@ -1,6 +1,21 @@
 #include "visnet.h"
 #include "packet.h"
 
+// Temporary fix
+void* extendsize(void* block, uint32_t size, uint32_t requested)
+{
+	if (requested < size)
+		return nullptr;
+
+	uint8_t* ptr = new uint8_t[requested];
+	memset(ptr, 0, requested);
+
+	memcpy(ptr, block, size);
+	delete[] block;
+
+	return ptr;
+}
+
 namespace visNET{
 	Packet::Packet()
 	{
@@ -27,7 +42,7 @@ namespace visNET{
 		if (!m_pData)
 			m_pData = new uint8_t[nLength];
 		else
-			m_pData = (uint8_t*)realloc(m_pData, m_nSize + nLength);
+			m_pData = (uint8_t*)extendsize(m_pData, m_nSize, m_nSize + nLength);
 
 		memcpy(m_pData + m_nSize, pData, nLength);
 		m_nSize += nLength;
@@ -141,7 +156,7 @@ namespace visNET{
 					return -1;
 				}
 
-				m_pData = (uint8_t*)realloc(m_pData, m_nSize);
+				m_pData = (uint8_t*)extendsize(m_pData, m_nCursor, m_nSize);
 			}
 		}
 
