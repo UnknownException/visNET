@@ -72,6 +72,9 @@ TEST(TcpTest, DisconnectClient)
 	if (connectionId != disconnected.at(0))
 		EXPECT_TRUE(false) << "Disconnection id does not match";
 
+	visNET::Packet packet;
+	tcpCl.send(packet);
+
 	std::this_thread::sleep_for(std::chrono::microseconds(1000));
 
 	EXPECT_TRUE(tcpCl.isDisconnected()) << "TCP client is giving the wrong state";
