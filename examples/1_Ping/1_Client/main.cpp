@@ -16,6 +16,7 @@ int main()
 	std::cout << "Sending message to server" << std::endl;
 
 	visNET::Packet packet;
+	packet.writeUInt8(0);
 	client.send(packet);
 
 	auto receive = client.receive();

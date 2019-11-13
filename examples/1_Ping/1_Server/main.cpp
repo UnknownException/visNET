@@ -40,6 +40,7 @@ int main()
 	std::cout << "Sending response to client" << std::endl;
 
 	visNET::Packet packet;
+	packet.writeUInt8(0);
 	server.send(receive.begin()->getConnectionIdentifier(), packet);
 
 	// Prevents the console to close
