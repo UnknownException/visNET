@@ -1,220 +1,175 @@
 #include "visnet.h"
 #include "packet.h"
 
-// Temporary fix
-void* extendsize(void* block, uint32_t size, uint32_t requested)
-{
-	if (requested < size)
-		return nullptr;
-
-	uint8_t* ptr = new uint8_t[requested];
-	memset(ptr, 0, requested);
-
-	memcpy(ptr, block, size);
-	delete[] static_cast<uint8_t*>(block);
-
-	return ptr;
-}
-
 namespace visNET{
 	Packet::Packet()
 	{
-		m_nSize = 0;
-		m_pData = nullptr;
-
-		m_nCursor = 0;
-		m_eState = PS_WRITABLE;
-
-		writeUInt32(0); // First 4 bytes are reserved for the packets size
+		m_Cursor = 0;
+		m_PacketState = PS_CLEAR;
 	}
 
 	Packet::~Packet()
 	{
-		if (m_pData)
-			delete[] m_pData;
 	}
 
-	void Packet::_write(const uint8_t* pData, uint32_t nLength)
+	void Packet::_write(const uint8_t* data, uint32_t dataSize)
 	{
+		if (isState(PS_CLEAR))
+		{
+			setState(PS_WRITABLE);
+			writeUInt32(0); // First 4 bytes are reserved for the packets size
+		}
+
 		if (!isState(PS_WRITABLE))
 			return;
 
-		if (!m_pData)
-			m_pData = new uint8_t[nLength];
-		else
-			m_pData = (uint8_t*)extendsize(m_pData, m_nSize, m_nSize + nLength);
+		m_Data.resize(m_Data.size() + dataSize);
+		memcpy(&m_Data[m_Data.size() - dataSize], data, dataSize);
 
-		memcpy(m_pData + m_nSize, pData, nLength);
-		m_nSize += nLength;
-
-		if (m_nSize > _visNET_PACKETSIZE_LIMIT)
+		if (m_Data.size() > _visNET_PACKETSIZE_LIMIT)
 			setState(PS_INVALID);
 	}
 
-	void Packet::writeString(const char* str)
+	void Packet::writeString(const char* string)
 	{
-		if (!isState(PS_WRITABLE))
+		if (!isState(PS_WRITABLE) && !isState(PS_CLEAR))
 			return;
 
-		uint32_t nLen = strlen(str);
-		
-		writeUInt32(nLen);
-		write(str, nLen);
+		uint32_t stringLength = strlen(string);
+		writeUInt32(stringLength);
+		write(string, stringLength);
 	}
 
-	bool Packet::_read(uint8_t* pBuffer, uint32_t nSize)
+	bool Packet::_read(uint8_t* buffer, uint32_t bufferSize)
 	{
 		if (!isState(PS_READABLE))
 			return false;
 
-		if (!m_pData || m_nCursor + nSize > m_nSize) // Can't read without data or outside bounds
+		if (m_Cursor + bufferSize > m_Data.size()) // Can't read outside of bounds
 		{
 			setState(PS_INVALID);
 			return false;
 		}
 
-		memcpy(pBuffer, m_pData + m_nCursor, nSize);
-
-		m_nCursor += nSize;
+		memcpy(buffer, &m_Data[m_Cursor], bufferSize);
+		m_Cursor += bufferSize;
 
 		return true;
 	}
 
-	bool Packet::readSkip(uint32_t nOffset)
+	bool Packet::readSkip(uint32_t skipSize)
 	{
 		if (!isState(PS_READABLE))
 			return false;
 
-		if (!m_pData || m_nCursor + nOffset > m_nSize) // Can't read without data or outside of bounds
+		if (m_Cursor + skipSize > m_Data.size()) // Can't read outside of bounds
 		{
 			setState(PS_INVALID);
 			return false;
 		}
 
-		m_nCursor += nOffset;
+		m_Cursor += skipSize;
 
 		return true;
 	}
 
 	std::string Packet::readString()
 	{
-		uint32_t nLen = readUInt32();
+		uint32_t stringSize = readUInt32();
 		if (!isState(PS_READABLE))
 			return "";
 
-		uint8_t* pBuffer = new uint8_t[nLen + 1]; //Add space for string terminator
-		if (!read(pBuffer, nLen))
+		uint8_t* stringBuffer = new uint8_t[stringSize + 1]; //Add space for string terminator
+		if (!read(stringBuffer, stringSize))
 		{
-			delete[] pBuffer;
+			delete[] stringBuffer;
 			return "";
 		}
 
-		pBuffer[nLen] = 0;
+		stringBuffer[stringSize] = 0;
 
-		std::string result(reinterpret_cast<char*>(pBuffer));
+		std::string result(reinterpret_cast<char*>(stringBuffer));
 
-		delete[] pBuffer;
+		delete[] stringBuffer;
 
 		return result;
 	}
 
-	int32_t Packet::_onReceive(uint8_t* pData, uint32_t nLength)
+	uint32_t Packet::_onReceive(uint8_t* data, uint32_t dataSize)
 	{
-		// Can't read into an already filled packet, except if its in receive state
-		if (!isState(PS_WRITABLE) && !isState(PS_INRECEIVE))
-			return -1;
-
-		if (isState(PS_WRITABLE))
-		{
-			delete[] m_pData;
-			m_pData = new uint8_t[sizeof(m_nSize)];
-			m_nSize = 0;
-
+		if (isState(PS_CLEAR))
 			setState(PS_INRECEIVE);
+		else if (!isState(PS_INRECEIVE))
+			return 0;
+
+		uint32_t dataRead = 0;
+
+		if (m_Cursor < PacketSizeLength)
+		{
+			uint32_t difference = PacketSizeLength - m_Cursor;
+			if (dataSize < difference)
+			{
+				m_Data.resize(m_Data.size() + dataSize);
+				memcpy(&m_Data[m_Cursor], data, dataSize);
+				m_Cursor += dataSize;
+
+				return 0; // No remaining bytes
+			}
+
+			m_Data.resize(m_Data.size() + difference);
+			memcpy(&m_Data[m_Cursor], data, difference);
+			m_Cursor += difference;
+			dataRead += difference;
+
+			uint32_t packetSize;
+			memcpy(&packetSize, &m_Data[0], sizeof(PacketSizeLength));
+
+			if (packetSize > _visNET_PACKETSIZE_LIMIT || packetSize < PacketSizeLength)
+			{
+				setState(PS_INVALID);
+				return 0; // No remaining bytes
+			}
+
+			m_Data.resize(packetSize);
 		}
 
-		// If we haven't retrieved the packetsize yet
-		uint32_t nRead = 0;
-		if (m_nSize == 0)
+		uint32_t remainingBytes = dataSize - dataRead;
+		if (remainingBytes > 0)
 		{
-			// Only copy enough to get the full packet size
-			uint32_t nDiff = sizeof(m_nSize) - m_nCursor;
-			nRead = nLength > nDiff ? nDiff : nLength;
-
-			memcpy(m_pData + m_nCursor, pData, nRead);
-			m_nCursor += nRead;
-			nLength -= nRead;
-
-			if (m_nCursor < sizeof(m_nSize)) // Haven't received all size bytes yet
-				return 0;
-			else
-			{
-				memcpy(&m_nSize, m_pData, sizeof(m_nSize)); // Get real size
-				if (m_nSize > _visNET_PACKETSIZE_LIMIT || m_nSize < sizeof(m_nSize))
-				{
-					setState(PS_INVALID);
-					return -1;
-				}
-
-				m_pData = (uint8_t*)extendsize(m_pData, m_nCursor, m_nSize);
-			}
+			uint32_t requiredBytes = m_Data.size() - m_Cursor;
+			uint32_t readableBytes = remainingBytes < requiredBytes ? remainingBytes : requiredBytes;
+			memcpy(&m_Data[m_Cursor], data + dataRead, readableBytes);
+			m_Cursor += readableBytes;
+			remainingBytes -= readableBytes;
 		}
 
-		uint32_t nAdditionalData = 0;
-
-		// Only copy when we actually have data to write
-		if (nLength != 0)
+		if (m_Data.size() == m_Cursor)
 		{
-			// Do not read more than required, cut off!
-			if (nLength + m_nCursor <= m_nSize)
-			{
-				memcpy(m_pData + m_nCursor, pData + nRead, nLength);
-				m_nCursor += nLength;
-			}
-			else
-			{
-				nAdditionalData = (nLength + m_nCursor) - m_nSize;
-				memcpy(m_pData + m_nCursor, pData + nRead, m_nSize - m_nCursor);
-				m_nCursor = m_nSize;
-			}
-		}
-
-		if (m_nSize == m_nCursor)
-		{
-			m_nCursor = sizeof(m_nSize); // Set the cursor back for reading (0 + 4)
+			m_Cursor = PacketSizeLength; // Set the cursor after packet size
 			setState(PS_READABLE);
 		}
 
-		return nAdditionalData; // 0 if no additionals
+		return remainingBytes;
 	}
 
 	bool Packet::_onSend() 
 	{
-		if (!isWritable())
+		if (!isState(PS_WRITABLE))
 			return false;
 
-		memcpy(m_pData, &m_nSize, sizeof(m_nSize)); // Overwrite first 4 bytes
+		uint32_t packetSize = m_Data.size();
+		memcpy(&m_Data[0], &packetSize, sizeof(packetSize)); // Overwrite first 4 bytes
 
 		return true;
 	}
-
+	
 	std::shared_ptr<Packet> Packet::_copy()
 	{
-		if (!isWritable())
-			return nullptr;
-
 		std::shared_ptr<Packet> copy = std::make_shared<Packet>();
-		// Delete initial 4 bytes
-		if (copy->m_pData)
-		{
-			delete[] copy->m_pData;
-			copy->m_pData = nullptr;
-			copy->m_nSize = 0;
-		}
-		
-		copy->write(m_pData, m_nSize);
-		copy->m_eState = m_eState;
-		
+		copy->m_Data = m_Data;
+		copy->m_PacketState = m_PacketState;
+		copy->m_Cursor = m_Cursor;
+
 		return copy;
 	}
 }
