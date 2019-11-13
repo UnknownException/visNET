@@ -7,9 +7,9 @@ TEST(Structure_BlobArray, CreateBlobArrayInt32)
 	visNET::BlobArray<int32_t> blob;
 
 	// Assert
-	EXPECT_EQ(0, blob.getSize());
-	EXPECT_EQ(0, blob.getItemCount());
-	EXPECT_EQ(sizeof(int32_t), blob.getItemSize());
+	EXPECT_EQ(0, blob.dataSize());
+	EXPECT_EQ(0, blob.size());
+	EXPECT_EQ(sizeof(int32_t), blob.itemSize());
 }
 
 TEST(Structure_BlobArray, AddValueToBlobArrayInt32)
@@ -21,9 +21,9 @@ TEST(Structure_BlobArray, AddValueToBlobArrayInt32)
 	blob.add(123);
 
 	// Assert
-	EXPECT_EQ(sizeof(int32_t) * 1, blob.getSize());
-	EXPECT_EQ(1, blob.getItemCount());
-	EXPECT_EQ(sizeof(int32_t), blob.getItemSize());
+	EXPECT_EQ(sizeof(int32_t) * 1, blob.dataSize());
+	EXPECT_EQ(1, blob.size());
+	EXPECT_EQ(sizeof(int32_t), blob.itemSize());
 }
 
 TEST(Structure_BlobArray, GetValueFromBlobArrayInt32)
@@ -33,7 +33,7 @@ TEST(Structure_BlobArray, GetValueFromBlobArrayInt32)
 	blob.add(123);
 
 	// Act
-	int32_t result = *blob.get(0);
+	int32_t result = *blob.getPtr(0);
 
 	// Assert
 	EXPECT_EQ(123, result);
@@ -46,8 +46,8 @@ TEST(Structure_BlobArray, GetNullPtrFromInvalidBlobArrayInt32Index)
 	blob.add(123);
 
 	// Act
-	int32_t* flipOver = blob.get(-1);
-	int32_t* edgeCase = blob.get(1);
+	int32_t* flipOver = blob.getPtr(-1);
+	int32_t* edgeCase = blob.getPtr(1);
 
 	// Assert
 	EXPECT_EQ(nullptr, flipOver);
@@ -69,9 +69,9 @@ TEST(Structure_BlobArray, AddArrayToBlobArrayInt32)
 	blob.add(itemArray, arraySize);
 
 	// Assert
-	EXPECT_EQ(sizeof(int32_t) * arraySize, blob.getSize());
-	EXPECT_EQ(arraySize, blob.getItemCount());
-	EXPECT_EQ(sizeof(int32_t), blob.getItemSize());
+	EXPECT_EQ(sizeof(int32_t) * arraySize, blob.dataSize());
+	EXPECT_EQ(arraySize, blob.size());
+	EXPECT_EQ(sizeof(int32_t), blob.itemSize());
 }
 
 TEST(Structure_BlobArray, GetAllValuesFromBlobArrayInt32FilledByArray)
@@ -89,7 +89,7 @@ TEST(Structure_BlobArray, GetAllValuesFromBlobArrayInt32FilledByArray)
 	// Act
 	int32_t resultArray[arraySize];
 	for (int32_t i = 0; i < arraySize; ++i)
-		resultArray[i] = *blob.get(i);
+		resultArray[i] = *blob.getPtr(i);
 
 	// Assert
 	for(int32_t i = 0; i < arraySize; ++i)

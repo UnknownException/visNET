@@ -31,7 +31,8 @@ namespace visNET{
 		if (!isValid() || !message.getPacket())
 			return false;
 
-		message.getPacket()->_onSend(); 
+		if (!message.getPacket()->_onSend())
+			return false;
 
 		uint32_t checksum = generateChecksum(message.getPacket()->_getRawData(), message.getPacket()->_getRawSize());
 		memcpy(m_pBuffer, &checksum, sizeof(uint32_t));

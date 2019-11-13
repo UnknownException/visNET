@@ -73,6 +73,7 @@ TEST(TcpTest, DisconnectClient)
 		EXPECT_TRUE(false) << "Disconnection id does not match";
 
 	visNET::Packet packet;
+	packet.writeUInt8(0);
 	tcpCl.send(packet);
 
 	std::this_thread::sleep_for(std::chrono::microseconds(1000));
