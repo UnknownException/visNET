@@ -2,31 +2,32 @@
 
 namespace visNET{
 	class DLLEXPORT Packet {
-		uint32_t m_nSize;
-		uint8_t* m_pData;
+		const uint32_t PacketSizeLength = sizeof(uint32_t);
 
-		uint32_t m_nCursor;
+		std::vector<uint8_t> m_Data;
+		uint32_t m_Cursor;
 
 		enum PSTATES {
 			PS_INVALID,
+			PS_CLEAR,
 			PS_WRITABLE,
 			PS_INRECEIVE,
 			PS_READABLE,
-		} m_eState;
+		} m_PacketState;
 
-		void setState(PSTATES e) { m_eState = e; }
-		bool isState(PSTATES e) { return m_eState == e; }
+		void setState(PSTATES packetState) { m_PacketState = packetState; }
+		bool isState(PSTATES packetState) { return m_PacketState == packetState; }
 	public:
 		Packet();
 		virtual ~Packet();
 
-		// If possible, use the predefined writetypes instead of directly writing to the buffer
 	private:
-		void _write(const uint8_t* data, uint32_t length);
+		void _write(const uint8_t* data, uint32_t dataSize);
 	public:
+		// If possible, use the predefined functions instead of directly writing to the buffer
 		template<typename T>
-		void write(const T* data, uint32_t length) {
-			_write(reinterpret_cast<const uint8_t*>(data), length);
+		void write(const T* data, uint32_t dataSize) {
+			_write(reinterpret_cast<const uint8_t*>(data), dataSize);
 		}
 
 		void writeInt8(int8_t n) { write(&n, sizeof(int8_t)); }
@@ -41,32 +42,32 @@ namespace visNET{
 		void writeDouble(double d) { write(&d, sizeof(double)); }
 		void writeBool(bool b) { write(&b, sizeof(bool)); }
 
-		void writeString(const char* str);
-		void writeString(std::string& str) { writeString(str.c_str()); }
+		void writeString(const char* string);
+		void writeString(std::string& string) { writeString(string.c_str()); }
 
 		template <typename T>
 		void writeBlobArray(BlobArray<T>& blob)
 		{
-			if (!isState(PS_WRITABLE))
+			if (!isState(PS_WRITABLE) && !isState(PS_CLEAR))
 				return;
 
-			writeUInt32(blob.getItemCount());
+			writeUInt32(blob.size());
 
-			if (blob.getItemCount() > 0)
-				write(blob.get(0), blob.getSize());
+			if (blob.size() > 0)
+				write(blob.getPtr(0), blob.dataSize());
 		}
 
 		// If possible, use the predefined readtypes instead of directly reading from the buffer
 	private:
-		bool _read(uint8_t* buffer, uint32_t size);
+		bool _read(uint8_t* buffer, uint32_t bufferSize);
 	public:
 		template<typename T>
-		bool read(T* buffer, uint32_t size) {
-			return _read(reinterpret_cast<uint8_t*>(buffer), size);
+		bool read(T* buffer, uint32_t bufferSize) {
+			return _read(reinterpret_cast<uint8_t*>(buffer), bufferSize);
 		}
 
 		// Skip an amount of bytes in the received packet
-		bool readSkip(uint32_t offset);
+		bool readSkip(uint32_t skipSize);
 
 		int8_t readInt8() {
 			int8_t n = 0;
@@ -140,49 +141,39 @@ namespace visNET{
 		std::shared_ptr<BlobArray<T>> readBlobArray(){
 			auto blob = std::make_shared<BlobArray<T>>();
 			if (!isState(PS_READABLE))
-				return blob;
+				return nullptr;
 
-			if (!m_pData || blob->getItemCount() != 0) // Can't read without data or in an already filled blob
-			{
-				setState(PS_INVALID);
-				return blob;
-			}
-
-			uint32_t nItemCount = readUInt32();
+			uint32_t itemCount = readUInt32();
 			if (!isState(PS_READABLE))
-				return blob;
+				return nullptr;
 
-			// Can't read more data than the packet buffer contains
-			if (m_nCursor + (nItemCount * blob->getItemSize()) > m_nSize)
+			// Prevent reading out of bounds
+			if (m_Cursor + (itemCount * sizeof(T)) > m_Data.size())
 			{
 				setState(PS_INVALID);
-				return blob;
+				return nullptr;
 			}
 
-			if (nItemCount > 0)
-				blob->add((T*)(m_pData + m_nCursor), nItemCount);
+			if (itemCount > 0)
+				blob->add((T*)(&m_Data[m_Cursor]), itemCount);
 
-			m_nCursor += nItemCount * blob->getItemSize();
+			m_Cursor += itemCount * sizeof(T);
 
 			return blob;
 		}
 
-		bool isReadable() { return isState(PS_READABLE); } // When the state is not readable, it hasn't read correctly
+		bool isReadable() { return isState(PS_READABLE); }
 		bool isValid() { return !isState(PS_INVALID); }
 		bool isWritable() { return isState(PS_WRITABLE); }
 		bool isTransfering() { return isState(PS_INRECEIVE); }
 
 		// Put these near the bottom in intellisense
 		// These _* functions shouldn't get called from any extern program except if declaring a custom packet type
-		const uint8_t* _getRawData() { return m_pData; }
-		const uint32_t _getRawSize() { return m_nSize; }
+		const uint8_t* _getRawData() { return &m_Data[0]; }
+		const uint32_t _getRawSize() { return m_Data.size(); }
 
-		// onReceive can return multiple values, two values have a special meaning
-		// -1: Packet is incorrect
-		// 0: Packet is correct
-		// >0: Packet is finished, we have additional data (new packet)
-
-		int32_t _onReceive(uint8_t* pData, uint32_t nLength);
+		// Return value of onReceive indicates if there is unread data remaining in the given buffer
+		uint32_t _onReceive(uint8_t* data, uint32_t dataSize);
 		bool _onSend(); //Gets called before being send
 		std::shared_ptr<Packet> _copy();
 	};

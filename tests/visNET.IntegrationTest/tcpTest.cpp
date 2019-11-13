@@ -73,6 +73,7 @@ TEST(TcpTest, DisconnectClient)
 		EXPECT_TRUE(false) << "Disconnection id does not match";
 
 	visNET::Packet packet;
+	packet.writeUInt8(0);
 	tcpCl.send(packet);
 
 	std::this_thread::sleep_for(std::chrono::microseconds(1000));
@@ -379,66 +380,6 @@ TEST(TcpTest, SendLotsOfPacketsToServer)
 	/* Check received values */
 	for (uint32_t i = 0; i < 4096 * 8; ++i)
 		EXPECT_EQ(i % 913, received[i]) << "Received value is different from expected value";
-
-	/* Shutdown Winsock */
-	EXPECT_TRUE(visNET::cleanup()) << "Failed to cleanup";
-}
-
-uint32_t timeGetTime()
-{
-	EXPECT_FALSE(true) << "Time function not implemented";
-	return 0;
-}
-
-TEST(TcpTest, TestTcpPerformance)
-{
-	uint32_t curTime = timeGetTime();
-
-	/* Create TCP listener and client */
-	EXPECT_TRUE(visNET::startup()) << "Failed to startup";
-
-	visNET::TcpListener tcpSvr(TESTTCP_PORT7);
-	EXPECT_TRUE(tcpSvr.isValid()) << "Failed to initialize TcpListener";
-
-	visNET::TcpClient tcpCl("127.0.0.1", TESTTCP_PORT7);
-	EXPECT_TRUE(tcpCl.isValid()) << "Failed to initialize TcpClient";
-
-	/* Create Test Packet */
-	visNET::Packet packet;
-	packet.writeDouble(31.5f);
-
-	/* Send Test Packet */
-	tcpCl.send(packet);
-
-	/* Receive attempts */
-	int32_t nAttempts = 5000;
-
-	/* Accept Connection */
-	auto connectionId = tcpSvr.getConnection();
-	while (connectionId == 0)
-	{
-		EXPECT_NE(0, nAttempts--) << "Failed to establish a connection";
-		connectionId = tcpSvr.getConnection();
-	}
-
-	/* Reset attempts */
-	nAttempts = 5000;
-
-	/* Receive Packet */
-	auto recv = tcpSvr.receive();
-	while (recv.empty())
-	{
-		EXPECT_NE(0, nAttempts--) << "Failed to receive a data packet";
-		recv = tcpSvr.receive();
-	}
-
-	auto pPacket = recv.at(0).getPacket();
-	EXPECT_TRUE(pPacket->isReadable());
-
-	EXPECT_EQ(static_cast<double>(31.5f), pPacket->readDouble()) << "Failed to read double from packet";
-
-	// Sleep performance....
-	EXPECT_FALSE(curTime + 5 < timeGetTime()) << "Failed to deliver local packet in time";
 
 	/* Shutdown Winsock */
 	EXPECT_TRUE(visNET::cleanup()) << "Failed to cleanup";

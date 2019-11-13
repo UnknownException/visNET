@@ -3,7 +3,7 @@
 TEST(PacketTest, ConstructPacket)
 {
 	visNET::Packet packet;
-	EXPECT_TRUE(packet.isWritable());
+	EXPECT_FALSE(packet.isWritable());
 
 	packet.writeBool(true);
 	packet.writeInt8(1);
@@ -119,10 +119,10 @@ TEST(PacketTest, SendAndReadPacketThroughTcpConnection)
 		EXPECT_TRUE(false) << "Failed to read uint64 from packet";
 
 	auto recvBlob = pPacket->readBlobArray<int32_t>();
-	EXPECT_EQ(static_cast<uint32_t>(3), recvBlob->getItemCount()) << "Incorrect blob count";
-	EXPECT_EQ(1, *recvBlob->get(0)) << "Blob value 1 is incorrect";
-	EXPECT_EQ(33, *recvBlob->get(1)) << "Blob value 2 is incorrect";
-	EXPECT_EQ(34, *recvBlob->get(2)) << "Blob value 3 is incorrect";
+	EXPECT_EQ(static_cast<uint32_t>(3), recvBlob->size()) << "Incorrect blob count";
+	EXPECT_EQ(1, *recvBlob->getPtr(0)) << "Blob value 1 is incorrect";
+	EXPECT_EQ(33, *recvBlob->getPtr(1)) << "Blob value 2 is incorrect";
+	EXPECT_EQ(34, *recvBlob->getPtr(2)) << "Blob value 3 is incorrect";
 
 	EXPECT_TRUE(pPacket->readSkip(sizeof(int16_t))) << L"Failed to skip parts of packet";
 	EXPECT_EQ(static_cast<int16_t>(34), pPacket->readInt16()) << "Failed to read uint16 after skip";
@@ -203,10 +203,10 @@ TEST(PacketTest, SendAndReadPacketThroughUdp)
 		EXPECT_TRUE(false) << "Failed to read uint64 from packet";
 
 	auto recvBlob = pPacket->readBlobArray<int32_t>();
-	EXPECT_EQ(static_cast<uint32_t>(3), recvBlob->getItemCount()) << "Incorrect blob count";
-	EXPECT_EQ(1, *recvBlob->get(0)) << "Blob value 1 is incorrect";
-	EXPECT_EQ(33, *recvBlob->get(1)) << "Blob value 2 is incorrect";
-	EXPECT_EQ(34, *recvBlob->get(2)) << "Blob value 3 is incorrect";
+	EXPECT_EQ(static_cast<uint32_t>(3), recvBlob->size()) << "Incorrect blob count";
+	EXPECT_EQ(1, *recvBlob->getPtr(0)) << "Blob value 1 is incorrect";
+	EXPECT_EQ(33, *recvBlob->getPtr(1)) << "Blob value 2 is incorrect";
+	EXPECT_EQ(34, *recvBlob->getPtr(2)) << "Blob value 3 is incorrect";
 
 	EXPECT_TRUE(pPacket->readSkip(sizeof(int16_t))) << L"Failed to skip parts of packet";
 	EXPECT_EQ(static_cast<int16_t>(34), pPacket->readInt16()) << "Failed to read uint16 after skip";
@@ -218,7 +218,7 @@ TEST(PacketTest, SendAndReadPacketThroughUdp)
 TEST(PacketTest, BlockReadingWritablePacket)
 {
 	visNET::Packet packet;
-	EXPECT_TRUE(packet.isWritable());
+	EXPECT_FALSE(packet.isWritable());
 
 	packet.writeInt8(43);
 

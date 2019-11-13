@@ -12,12 +12,13 @@ TEST(UdpTest, ConstructPeers)
 	visNET::UdpClient udpClient4(TESTUDP_PORT5);
 	EXPECT_FALSE(udpClient4.isValid());
 
-	/* Send from invalid peer */
 	visNET::Packet packet;
+	packet.writeInt8(0);
+
+	/* Send from invalid peer */
 	EXPECT_FALSE(udpClient4.send("127.0.0.1", TESTUDP_PORT3, packet));
 
 	/* Send to peer udpClient3; Should not receive at peer udpClient4 */
-	visNET::Packet packet2;
 	EXPECT_TRUE(udpClient1.send("127.0.0.1", TESTUDP_PORT5, packet));
 
 	/* Get received packet size from invalid peer */
@@ -27,11 +28,9 @@ TEST(UdpTest, ConstructPeers)
 	EXPECT_EQ(static_cast<size_t>(1), udpClient3.receive().size()) << "Valid peer 3 didn't receive a packet";
 
 	/* Send to peer udpClient1 from peer udpClient2 */
-	visNET::Packet packet3;
 	EXPECT_TRUE(udpClient2.send("127.0.0.1", TESTUDP_PORT3, packet));
 
 	/* Send to peer udpClient2 from peer udpClient3 */
-	visNET::Packet packet4;
 	EXPECT_TRUE(udpClient3.send("127.0.0.1", TESTUDP_PORT4, packet));
 
 	/* Get received packet size from valid peer */

@@ -8,8 +8,11 @@ TEST(Packet_Packet, CreatePacket)
 	visNET::Packet packet;
 
 	// Assert
-	EXPECT_TRUE(packet.isWritable());
 	EXPECT_TRUE(packet.isValid());
+
+	EXPECT_FALSE(packet.isWritable());
+	EXPECT_FALSE(packet.isReadable());
+	EXPECT_FALSE(packet.isTransfering());
 }
 
 TEST(Packet_Packet, EmptyReceivedPacketShouldBeValid)
